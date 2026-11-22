@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老师监控后台 | 华小国语人称代词 Kata Ganti Nama Diri Admin</title>
+    <style>
+        :root {
+            --bg: #1e1e22;
+            --card-bg: #2a2a30;
+            --input-bg: #18181b;
+            --border: #3f3f46;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --primary: #60a5fa;
+            --primary-btn: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #fb923c;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+        .lock-overlay {
+            position: fixed; inset: 0; background: rgba(18, 18, 22, 0.96);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .lock-card {
+            background: var(--card-bg); border: 2px solid var(--border); border-radius: 20px;
+            padding: 32px 28px; max-width: 400px; width: 100%; text-align: center;
+            display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .lock-card h2 { color: var(--primary); font-size: 1.4em; }
+        .lock-input {
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+            background: var(--input-bg); color: var(--text); font-size: 1.1em; text-align: center; outline: none;
+        }
+        .lock-input:focus { border-color: var(--primary); }
+        .lock-err { color: #f87171; font-size: 0.9em; font-weight: bold; min-height: 18px; }
+
+        header {
+            position: sticky; top: 0; z-index: 100; background: #25252b;
+            border-bottom: 2px solid var(--border); padding: 14px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+        }
+        .header-top {
+            max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .header-title { display: flex; align-items: center; gap: 10px; }
+        .header-title h1 { font-size: 1.3em; color: var(--primary); font-weight: 800; }
+        .badge { background: #1e3a5f; color: #93c5fd; padding: 3px 10px; border-radius: 14px; font-size: 0.82em; font-weight: bold; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .btn {
+            border: none; border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 0.88em;
+            cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary-btn); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+        .btn-outline:hover { background: #32323a; }
+
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px; margin-bottom: 20px;
+        }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+        .stat-label { font-size: 0.85em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+        .stat-val { font-size: 1.9em; font-weight: 800; color: var(--text); }
+        .stat-sub { font-size: 0.8em; color: var(--primary); margin-top: 4px; }
+
+        .controls-bar {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+            padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+            justify-content: space-between; margin-bottom: 16px;
+        }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .filter-input, .filter-select {
+            background: var(--input-bg); border: 1.5px solid var(--border); color: var(--text);
+            padding: 8px 12px; border-radius: 8px; font-size: 0.9em; outline: none;
+        }
+        .filter-input { min-width: 220px; }
+        .filter-input:focus, .filter-select:focus { border-color: var(--primary); }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .tab-btn {
+            background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border);
+            padding: 9px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.92em;
+        }
+        .tab-btn.active { background: var(--primary-btn); color: white; border-color: var(--primary-btn); }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .table-wrap {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+            overflow-x: auto; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #222228; color: #cbd5e1; font-weight: 700; white-space: nowrap; }
+        tr:hover td { background: rgba(255,255,255,0.03); }
+        .pill-ok { background: rgba(34,197,94,0.18); color: #4ade80; padding: 3px 9px; border-radius: 10px; font-weight: 700; font-size: 0.85em; }
+        .pill-warn { background: rgba(251,146,60,0.18); color: #fb923c; padding: 3px 9px; border-radius: 10px; font-weight: 700; font-size: 0.85em; }
+        .pill-err { background: rgba(239,68,68,0.18); color: #f87171; padding: 3px 9px; border-radius: 10px; font-weight: 700; font-size: 0.85em; }
+        .wrong-tag {
+            display: inline-block; background: rgba(239,68,68,0.15); color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.35); border-radius: 6px; padding: 2px 7px;
+            font-size: 0.82em; margin: 2px 3px 2px 0;
+        }
+        .empty-msg { text-align: center; padding: 40px 20px; color: var(--muted); }
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            display: none; align-items: center; justify-content: center; z-index: 1200; padding: 16px;
+        }
+        .modal-card {
+            background: var(--card-bg); border: 2px solid var(--border); border-radius: 16px;
+            padding: 22px; width: 460px; max-width: 96vw; display: flex; flex-direction: column;
+            gap: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .modal-card h3 { color: var(--primary); font-size: 1.15em; }
+        .modal-field { display: flex; flex-direction: column; gap: 5px; }
+        .modal-field label { font-size: 0.85em; color: var(--muted); font-weight: 600; }
+        .modal-textarea {
+            background: var(--input-bg); border: 1.5px solid var(--border); color: var(--text);
+            padding: 10px 12px; border-radius: 8px; font-size: 0.9em; min-height: 140px;
+            font-family: monospace; outline: none; resize: vertical;
+        }
+        .modal-textarea:focus { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <!-- Lock Screen -->
+    <div class="lock-overlay" id="lock-overlay">
+        <div class="lock-card">
+            <div style="font-size:2.6em;">🔐</div>
+            <h2>老师监控后台 (Admin)</h2>
+            <p style="font-size:0.88em; color:#94a3b8;">华小国语人称代词连连乐 · Kata Ganti Nama Diri</p>
+            <input type="password" class="lock-input" id="admin-pass-input" placeholder="请输入管理员密码..." onkeydown="if(event.key==='Enter') unlockAdmin()">
+            <div class="lock-err" id="lock-err"></div>
+            <button class="btn btn-primary" style="justify-content:center; padding:11px;" onclick="unlockAdmin()">🔓 解锁进入后台</button>
+        </div>
+    </div>
+
+    <!-- Add / Batch / Edit Student Modals -->
+    <div class="modal-overlay" id="add-student-modal" onclick="if(event.target===this) closeAddStudentModal()">
+        <div class="modal-card">
+            <h3>➕ 新增学生账号 (Add New Student)</h3>
+            <div class="modal-field"><label>学生姓名 (Display Name) *</label><input type="text" class="filter-input" id="new-stu-name" placeholder="例: Johnny Tan"></div>
+            <div class="modal-field"><label>登录账号 (Username，留空则自动取小写姓名)</label><input type="text" class="filter-input" id="new-stu-username" placeholder="例: johnny"></div>
+            <div class="modal-field"><label>班级 (Class)</label><input type="text" class="filter-input" id="new-stu-class" placeholder="例: 4A"></div>
+            <div class="modal-field"><label>密码 / PIN (建议 4 位数字) *</label><input type="text" class="filter-input" id="new-stu-pin" placeholder="例: 1234" value="1234"></div>
+            <div id="add-stu-err" style="color:#f87171; font-size:0.85em; min-height:16px;"></div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn btn-outline" onclick="closeAddStudentModal()">取消</button>
+                <button class="btn btn-success" id="btn-save-new-stu" onclick="submitNewStudent()">✅ 确认创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="batch-student-modal" onclick="if(event.target===this) closeBatchStudentModal()">
+        <div class="modal-card" style="width:560px;">
+            <h3>📋 批量导入学生账号 (Batch Import)</h3>
+            <p style="font-size:0.84em; color:#94a3b8; line-height:1.5;">每行一位学生，用英文逗号分隔：<br><code>姓名, 班级, 密码</code> 或 <code>姓名, 登录账号, 班级, 密码</code></p>
+            <textarea class="modal-textarea" id="batch-stu-text" placeholder="Johnny Tan, 4A, 1234&#10;Ali Ahmad, 4A, 2233&#10;Mei Ling, meiling, 4B, 5678"></textarea>
+            <div id="batch-stu-err" style="color:#f87171; font-size:0.85em; min-height:16px;"></div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn btn-outline" onclick="closeBatchStudentModal()">取消</button>
+                <button class="btn btn-primary" id="btn-batch-stu" onclick="submitBatchStudents()">🚀 开始批量导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="edit-pin-modal" onclick="if(event.target===this) closeEditPinModal()">
+        <div class="modal-card">
+            <h3>🔑 重置学生密码 (Reset PIN)</h3>
+            <p id="edit-pin-target" style="font-size:0.92em; color:#cbd5e1;"></p>
+            <div class="modal-field"><label>新密码 / PIN *</label><input type="text" class="filter-input" id="edit-pin-input" placeholder="输入新密码"></div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn btn-outline" onclick="closeEditPinModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitEditPin()">💾 保存新密码</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-top">
+            <div class="header-title">
+                <h1>📊 老师监控后台 · 国语人称代词 (Kata Ganti Nama Diri)</h1>
+                <span class="badge" id="sync-status">⏳ 未同步</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="loadAllData()">🔄 刷新数据</button>
+                <button class="btn btn-success" onclick="exportCSV()">📥 导出 Excel (CSV)</button>
+                <button class="btn btn-outline" onclick="window.open('index.html','_blank')">🎮 打开游戏</button>
+                <button class="btn btn-outline" onclick="lockAdmin()">🔒 锁定</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">👩‍🎓 启用中学生</div>
+                <div class="stat-val" id="stat-students">0</div>
+                <div class="stat-sub" id="stat-students-sub">共有 0 名学生</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">📝 累计练习次数</div>
+                <div class="stat-val" id="stat-rounds">0</div>
+                <div class="stat-sub" id="stat-today">今日练习：0 次</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🎯 全班平均正确率</div>
+                <div class="stat-val" id="stat-acc">0%</div>
+                <div class="stat-sub" id="stat-total-q">累计作答：0 题</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">❌ 累计错题次数</div>
+                <div class="stat-val" id="stat-wrongs">0</div>
+                <div class="stat-sub" id="stat-top-wrong">高频错题：暂无</div>
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <div class="filter-group">
+                <input type="text" class="filter-input" id="search-input" placeholder="🔍 搜索学生名字 / 错题..." oninput="applyFilters()">
+                <select class="filter-select" id="class-filter" onchange="applyFilters()"><option value="ALL">🏫 全部班级</option></select>
+                <select class="filter-select" id="cat-filter" onchange="applyFilters()"><option value="ALL">📚 全部单元</option></select>
+            </div>
+            <div style="font-size:0.85em; color:var(--muted);" id="filter-count">显示 0 条记录</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-history" onclick="switchTab('history')">📋 最新答题记录</button>
+            <button class="tab-btn" id="tab-students" onclick="switchTab('students')">👩‍🎓 学生账号管理</button>
+            <button class="tab-btn" id="tab-quizzes" onclick="switchTab('quizzes')">📝 测验派发管理</button>
+            <button class="tab-btn" id="tab-wrong" onclick="switchTab('wrong')">❌ 高频错题排行榜</button>
+        </div>
+
+        <!-- Tab 1: History -->
+        <div class="panel active" id="panel-history">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间</th><th>学生 (班级)</th><th>状态</th><th>单元 / 测验</th>
+                            <th>答对 / 总题数</th><th>正确率</th><th>用时</th><th>错题详情</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody"><tr><td colspan="8" class="empty-msg">⏳ 加载中...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Students -->
+        <div class="panel" id="panel-students">
+            <div class="controls-bar" style="margin-bottom:12px;">
+                <span style="font-size:0.9em; color:#cbd5e1; font-weight:600;">👩‍🎓 学生账号统一由老师管理（共 <strong id="stu-panel-count">0</strong> 位，共享全科学生账号）</span>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="openAddStudentModal()">➕ Add New (新增学生)</button>
+                    <button class="btn btn-primary" onclick="openBatchStudentModal()">📋 批量导入</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学生姓名</th><th>登录账号</th><th>密码 (PIN)</th><th>班级</th>
+                            <th>状态</th><th>完成组数</th><th>平均正确率</th><th>最后活跃</th><th>管理操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-tbody"><tr><td colspan="9" class="empty-msg">⏳ 加载中...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Quizzes & Assignments -->
+        <div class="panel" id="panel-quizzes">
+            <div class="controls-bar" style="margin-bottom:16px; flex-direction:column; align-items:stretch; gap:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <strong style="color:#60a5fa; font-size:1.05em;">📝 创建并派发测验 (Create & Assign Quiz)</strong>
+                    <span id="quiz-vocab-status" style="font-size:0.85em; color:#94a3b8;">⏳ 正在加载题库...</span>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <input type="text" class="filter-input" id="quiz-code-input" placeholder="测验编号 (例: Quiz 001)" style="max-width:170px; min-width:140px; font-weight:bold;">
+                    <input type="text" class="filter-input" id="quiz-title-input" placeholder="备注说明 (可选，例: Group A 练习)" style="min-width:220px;">
+                    <label style="font-size:0.9em; color:#cbd5e1; display:flex; align-items:center; gap:6px;">
+                        题数：<input type="number" class="filter-input" id="quiz-qcount-input" value="20" min="1" max="100" style="width:80px; min-width:70px; text-align:center;" oninput="updateSelectedUnitsSummary()">
+                    </label>
+                </div>
+                <div style="background:#1c1c21; border:1px solid var(--border); border-radius:8px; padding:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                        <strong style="font-size:0.92em; color:#93c5fd;">📚 选择单元（可多选）：</strong>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn btn-outline" style="padding:4px 10px; font-size:0.8em;" onclick="selectUnitPreset('ALL')">📘 全选</button>
+                            <button class="btn btn-outline" style="padding:4px 10px; font-size:0.8em;" onclick="selectUnitPreset('NONE')">🧹 清空</button>
+                        </div>
+                    </div>
+                    <div id="quiz-units-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:6px; max-height:210px; overflow-y:auto; padding:4px;"></div>
+                    <div id="quiz-units-summary" style="margin-top:8px; font-size:0.86em; color:#fcd34d; font-weight:700;">请至少选择一个单元</div>
+                </div>
+                <div style="background:#1c1c21; border:1px solid var(--border); border-radius:8px; padding:12px;">
+                    <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+                        <strong style="font-size:0.92em; color:#86efac;">👩‍🎓 派发给学生：</strong>
+                        <label style="cursor:pointer; font-size:0.9em;"><input type="radio" name="assign-mode" value="ALL" checked onchange="toggleAssignMode()"> 🌐 全部启用中学生</label>
+                        <label style="cursor:pointer; font-size:0.9em;"><input type="radio" name="assign-mode" value="CLASS" onchange="toggleAssignMode()"> 🏫 指定班级</label>
+                        <select class="filter-select" id="assign-class-select" style="display:none; padding:4px 10px;" onchange="updateAssignPreview()"></select>
+                        <label style="cursor:pointer; font-size:0.9em;"><input type="radio" name="assign-mode" value="PICK" onchange="toggleAssignMode()"> 🎯 手动勾选学生</label>
+                    </div>
+                    <div id="assign-students-picker" style="display:none; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:6px; max-height:150px; overflow-y:auto; padding-top:6px; border-top:1px dashed var(--border);"></div>
+                    <div id="assign-target-summary" style="font-size:0.85em; color:#94a3b8; margin-top:4px;"></div>
+                </div>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn btn-success" id="btn-create-quiz" onclick="createAndAssignQuiz()">🚀 创建测验并立即派发</button>
+                    <span id="create-quiz-msg" style="font-size:0.9em; font-weight:bold;"></span>
+                </div>
+            </div>
+            <div id="quizzes-list-wrap" style="display:flex; flex-direction:column; gap:14px;">
+                <div class="empty-msg">⏳ 加载测验列表中...</div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Most Missed Questions -->
+        <div class="panel" id="panel-wrong">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>排名</th><th>题号 / 正确答案</th><th>题目句子</th><th>全班累计答错次数</th></tr>
+                    </thead>
+                    <tbody id="wrong-tbody"><tr><td colspan="4" class="empty-msg">⏳ 加载中...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "admin9332";
+        const SUPABASE_URL = "https://kuybhocpdsttmmjkihcv.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_kdVxbLe5qMPNkjMhccq52w_ia8RseMQ";
+
+        let allStudents = [];
+        let allHistory = [];
+        let filteredHistory = [];
+        let allQuizzes = [];
+        let allAssignments = [];
+        let allVocab = [];
+
+        async function sbFetch(path, options = {}) {
+            const headers = {
+                "apikey": SUPABASE_KEY,
+                "Authorization": "Bearer " + SUPABASE_KEY,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            };
+            const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
+            const text = await res.text();
+            let data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+            if (!res.ok) throw new Error((data && (data.message || data.hint || data.details)) || ("HTTP " + res.status));
+            return data;
+        }
+
+        function unlockAdmin() {
+            const val = document.getElementById('admin-pass-input').value;
+            if (val === ADMIN_PASSWORD) {
+                sessionStorage.setItem('bm_admin_ok', '1');
+                document.getElementById('lock-overlay').style.display = 'none';
+                document.getElementById('lock-err').textContent = "";
+                loadAllData();
+            } else {
+                document.getElementById('lock-err').textContent = "❌ 密码错误，请重试";
+            }
+        }
+
+        function lockAdmin() {
+            sessionStorage.removeItem('bm_admin_ok');
+            document.getElementById('admin-pass-input').value = "";
+            document.getElementById('lock-overlay').style.display = 'flex';
+        }
+
+        function switchTab(name) {
+            ['history', 'students', 'quizzes', 'wrong'].forEach(t => {
+                document.getElementById('tab-' + t).classList.toggle('active', t === name);
+                document.getElementById('panel-' + t).classList.toggle('active', t === name);
+            });
+        }
+
+        async function loadVocabOnce() {
+            if (allVocab.length > 0) return;
+            const stEl = document.getElementById('quiz-vocab-status');
+            try {
+                const res = await fetch('kata_ganti_nama_data.json', { cache: 'no-store' });
+                allVocab = await res.json();
+                stEl.textContent = `✅ 已加载题库 (${allVocab.length} 题)`;
+                stEl.style.color = '#86efac';
+                populateCatFilter();
+                renderQuizUnitsGrid();
+            } catch (err) {
+                stEl.textContent = '⚠️ 题库加载失败：' + err.message;
+                stEl.style.color = '#f87171';
+            }
+        }
+
+        function populateCatFilter() {
+            const sel = document.getElementById('cat-filter');
+            const prev = sel.value;
+            const cats = Array.from(new Set(allVocab.map(w => w.category).filter(Boolean)));
+            sel.innerHTML = `<option value="ALL">📚 全部单元</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (cats.includes(prev)) sel.value = prev;
+        }
+
+        async function loadAllData() {
+            const statusEl = document.getElementById('sync-status');
+            statusEl.textContent = "⏳ 正在拉取最新数据...";
+            loadVocabOnce();
+            try {
+                const [students, history] = await Promise.all([
+                    sbFetch("students?select=*&order=created_at.desc"),
+                    sbFetch("quiz_history_kgnd?select=*&order=played_at.desc&limit=500")
+                ]);
+                allStudents = students || [];
+                allHistory = history || [];
+
+                try {
+                    const [quizzes, assigns] = await Promise.all([
+                        sbFetch("quizzes_kgnd?select=*&order=created_at.desc"),
+                        sbFetch("quiz_assignments_kgnd?select=*&order=assigned_at.desc&limit=1000")
+                    ]);
+                    allQuizzes = quizzes || [];
+                    allAssignments = assigns || [];
+                } catch (qErr) {
+                    allQuizzes = [];
+                    allAssignments = [];
+                }
+
+                populateClassFilter();
+                populateQuizAssignTargets();
+                suggestNextQuizCode();
+                applyFilters();
+                renderQuizzesList();
+                statusEl.textContent = `✅ 已同步 (${new Date().toLocaleTimeString('zh-MY', { hour12: false })})`;
+            } catch (err) {
+                statusEl.textContent = "⚠️ 同步失败：" + err.message;
+            }
+        }
+
+        function populateClassFilter() {
+            const sel = document.getElementById('class-filter');
+            const prev = sel.value;
+            const classes = Array.from(new Set(allStudents.map(s => (s.class_name || '').trim()).filter(Boolean))).sort();
+            sel.innerHTML = `<option value="ALL">🏫 全部班级</option>` + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (classes.includes(prev)) sel.value = prev;
+        }
+
+        function applyFilters() {
+            const q = document.getElementById('search-input').value.trim().toLowerCase();
+            const cls = document.getElementById('class-filter').value;
+            const cat = document.getElementById('cat-filter').value;
+
+            const studentClassMap = {};
+            allStudents.forEach(s => { studentClassMap[s.id] = (s.class_name || '').trim(); });
+
+            filteredHistory = allHistory.filter(h => {
+                if (cls !== "ALL" && (studentClassMap[h.student_id] || '') !== cls) return false;
+                if (cat !== "ALL" && h.category !== cat) return false;
+                if (q) {
+                    const nameMatch = (h.display_name || '').toLowerCase().includes(q) || (h.username || '').toLowerCase().includes(q);
+                    const wrongs = Array.isArray(h.wrong_words) ? h.wrong_words : [];
+                    const wrongMatch = wrongs.some(w => (w.bm || '').toLowerCase().includes(q) || (w.chinese || '').toLowerCase().includes(q));
+                    if (!nameMatch && !wrongMatch) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('filter-count').textContent = `显示 ${filteredHistory.length} 条记录`;
+            renderStats();
+            renderHistoryTable();
+            renderStudentsTable(cls, q);
+            renderWrongRanking();
+        }
+
+        function renderStats() {
+            const activeCount = allStudents.filter(s => s.is_active !== false).length;
+            const inactiveCount = allStudents.length - activeCount;
+            document.getElementById('stat-students').textContent = activeCount;
+            document.getElementById('stat-students-sub').textContent = inactiveCount > 0 ? `共有 ${allStudents.length} 名（${inactiveCount} 名已停用）` : `共有 ${allStudents.length} 名注册学生`;
+            document.getElementById('stat-rounds').textContent = filteredHistory.length;
+
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const todayCount = filteredHistory.filter(h => (h.played_at || '').startsWith(todayStr)).length;
+            document.getElementById('stat-today').textContent = `今日练习：${todayCount} 次`;
+
+            const avgAcc = filteredHistory.length ? Math.round(filteredHistory.reduce((s, h) => s + (h.accuracy || 0), 0) / filteredHistory.length) : 0;
+            const totalQ = filteredHistory.reduce((s, h) => s + (h.score_correct || 0) + (h.score_wrong || 0), 0);
+            const totalW = filteredHistory.reduce((s, h) => s + (h.score_wrong || 0), 0);
+            document.getElementById('stat-acc').textContent = avgAcc + "%";
+            document.getElementById('stat-total-q').textContent = `累计作答：${totalQ} 题`;
+            document.getElementById('stat-wrongs').textContent = totalW;
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-tbody');
+            if (filteredHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-msg">暂无符合条件的答题记录</td></tr>`;
+                return;
+            }
+            const studentMap = {};
+            allStudents.forEach(s => { studentMap[s.id] = s; });
+
+            tbody.innerHTML = filteredHistory.map(h => {
+                const stu = studentMap[h.student_id] || {};
+                const dt = h.played_at ? new Date(h.played_at).toLocaleString('zh-MY', { hour12: false }) : '-';
+                const dur = (h.duration_seconds || 0) >= 60 ? `${Math.floor(h.duration_seconds/60)}m${h.duration_seconds%60}s` : `${h.duration_seconds || 0}s`;
+                const accClass = h.accuracy >= 80 ? 'pill-ok' : (h.accuracy >= 60 ? 'pill-warn' : 'pill-err');
+                const wrongs = Array.isArray(h.wrong_words) ? h.wrong_words : [];
+                const answered = (h.score_correct || 0) + (h.score_wrong || 0);
+                const totalQ = h.total_questions || 20;
+                const isDone = answered >= totalQ;
+                const statusBadge = isDone ? `<span class="pill-ok">✅ 已完成</span>` : `<span class="pill-warn">⏳ 中途退出 (${answered}/${totalQ})</span>`;
+                const wrongHtml = wrongs.length ? wrongs.map(w => `<span class="wrong-tag">${w.bm || w.id}</span>`).join('') : `<span style="color:#4ade80; font-size:0.85em;">🌟 全对</span>`;
+                return `
+                    <tr>
+                        <td style="white-space:nowrap; color:#94a3b8; font-size:0.84em;">${dt}</td>
+                        <td><strong style="color:#fb923c;">${h.display_name || h.username}</strong> ${stu.class_name ? `<span class="badge">${stu.class_name}</span>` : ''}</td>
+                        <td style="white-space:nowrap;">${statusBadge}</td>
+                        <td>${h.category === 'ALL' ? '🌟 全部题目' : h.category}</td>
+                        <td><strong>${h.score_correct}</strong> / ${totalQ}</td>
+                        <td><span class="${accClass}">${h.accuracy}%</span></td>
+                        <td>${dur}</td>
+                        <td>${wrongHtml}</td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function renderStudentsTable(clsFilter, searchQ) {
+            const tbody = document.getElementById('students-tbody');
+            const list = allStudents.filter(s => {
+                if (clsFilter !== "ALL" && (s.class_name || '').trim() !== clsFilter) return false;
+                if (searchQ && !(s.display_name || '').toLowerCase().includes(searchQ) && !(s.username || '').toLowerCase().includes(searchQ)) return false;
+                return true;
+            });
+            document.getElementById('stu-panel-count').textContent = list.length;
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">暂无学生账号，请点击右上角「➕ Add New」新增</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(s => {
+                const active = s.is_active !== false;
+                const stuHist = allHistory.filter(h => h.student_id === s.id);
+                const avg = stuHist.length ? Math.round(stuHist.reduce((sum, h) => sum + (h.accuracy || 0), 0) / stuHist.length) : 0;
+                const lastDt = s.last_login ? new Date(s.last_login).toLocaleString('zh-MY', { hour12: false }) : '-';
+                const statusBadge = active ? `<span class="pill-ok">✅ 启用</span>` : `<span class="pill-err">⏸️ 已停用</span>`;
+                const toggleBtn = active
+                    ? `<button class="btn btn-outline" style="padding:4px 9px; font-size:0.8em; color:#f87171; border-color:#ef4444;" onclick="toggleStudentActive('${s.id}', false, '${String(s.display_name).replace(/'/g, "\\'")}')">⏸️ 停用</button>`
+                    : `<button class="btn btn-outline" style="padding:4px 9px; font-size:0.8em; color:#4ade80; border-color:#22c55e;" onclick="toggleStudentActive('${s.id}', true, '${String(s.display_name).replace(/'/g, "\\'")}')">▶️ 启用</button>`;
+                return `
+                    <tr style="${active ? '' : 'opacity:0.6;'}">
+                        <td><strong style="color:#60a5fa;">${s.display_name}</strong></td>
+                        <td><code style="color:#e2e8f0;">${s.username}</code></td>
+                        <td><code style="color:#fcd34d; background:#18181b; padding:2px 6px; border-radius:4px;">${s.pin}</code></td>
+                        <td>${s.class_name || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${stuHist.length} 组</td>
+                        <td><span class="${avg >= 80 ? 'pill-ok' : (stuHist.length ? 'pill-warn' : '')}">${stuHist.length ? avg + '%' : '-'}</span></td>
+                        <td style="font-size:0.84em; color:#94a3b8;">${lastDt}</td>
+                        <td style="white-space:nowrap; display:flex; gap:6px;">
+                            <button class="btn btn-outline" style="padding:4px 9px; font-size:0.8em;" onclick="filterByStudent('${String(s.display_name).replace(/'/g, "\\'")}')">🔍 记录</button>
+                            <button class="btn btn-outline" style="padding:4px 9px; font-size:0.8em;" onclick="openEditPinModal('${s.id}', '${String(s.display_name).replace(/'/g, "\\'")}', '${s.pin}')">🔑 改密码</button>
+                            ${toggleBtn}
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function filterByStudent(name) {
+            document.getElementById('search-input').value = name;
+            applyFilters();
+            switchTab('history');
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('new-stu-name').value = "";
+            document.getElementById('new-stu-username').value = "";
+            document.getElementById('new-stu-class').value = "";
+            document.getElementById('new-stu-pin').value = "1234";
+            document.getElementById('add-stu-err').textContent = "";
+            document.getElementById('add-student-modal').style.display = 'flex';
+        }
+        function closeAddStudentModal() { document.getElementById('add-student-modal').style.display = 'none'; }
+
+        async function submitNewStudent() {
+            const displayName = document.getElementById('new-stu-name').value.trim();
+            let username = document.getElementById('new-stu-username').value.trim().toLowerCase().replace(/\s+/g, '');
+            const className = document.getElementById('new-stu-class').value.trim();
+            const pin = document.getElementById('new-stu-pin').value.trim();
+            const errEl = document.getElementById('add-stu-err');
+            if (!displayName || !pin) { errEl.textContent = "请填写学生姓名和密码！"; return; }
+            if (!username) username = displayName.toLowerCase().replace(/\s+/g, '');
+            try {
+                await sbFetch("students", { method: "POST", body: JSON.stringify({ username, display_name: displayName, class_name: className, pin, is_active: true }) });
+                closeAddStudentModal();
+                await loadAllData();
+            } catch (err) {
+                errEl.textContent = "❌ 创建失败：" + err.message;
+            }
+        }
+
+        function openBatchStudentModal() {
+            document.getElementById('batch-stu-text').value = "";
+            document.getElementById('batch-stu-err').textContent = "";
+            document.getElementById('batch-student-modal').style.display = 'flex';
+        }
+        function closeBatchStudentModal() { document.getElementById('batch-student-modal').style.display = 'none'; }
+
+        async function submitBatchStudents() {
+            const raw = document.getElementById('batch-stu-text').value.trim();
+            const errEl = document.getElementById('batch-stu-err');
+            if (!raw) { errEl.textContent = "请输入至少一行学生资料！"; return; }
+            const rows = [];
+            for (const line of raw.split('\n').map(l => l.trim()).filter(Boolean)) {
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length < 3) { errEl.textContent = "格式有误：" + line; return; }
+                const display_name = parts[0];
+                const username = (parts.length >= 4 ? parts[1] : display_name).toLowerCase().replace(/\s+/g, '');
+                const class_name = parts.length >= 4 ? parts[2] : parts[1];
+                const pin = parts.length >= 4 ? parts[3] : parts[2];
+                rows.push({ username, display_name, class_name, pin, is_active: true });
+            }
+            try {
+                await sbFetch("students", { method: "POST", body: JSON.stringify(rows) });
+                closeBatchStudentModal();
+                await loadAllData();
+            } catch (err) {
+                errEl.textContent = "❌ 导入失败：" + err.message;
+            }
+        }
+
+        let editingPinStudentId = null;
+        function openEditPinModal(id, name, oldPin) {
+            editingPinStudentId = id;
+            document.getElementById('edit-pin-target').textContent = `学生：${name}（当前密码：${oldPin}）`;
+            document.getElementById('edit-pin-input').value = oldPin;
+            document.getElementById('edit-pin-modal').style.display = 'flex';
+        }
+        function closeEditPinModal() { document.getElementById('edit-pin-modal').style.display = 'none'; editingPinStudentId = null; }
+
+        async function submitEditPin() {
+            const newPin = document.getElementById('edit-pin-input').value.trim();
+            if (!newPin || !editingPinStudentId) return;
+            await sbFetch(`students?id=eq.${editingPinStudentId}`, { method: "PATCH", body: JSON.stringify({ pin: newPin }) });
+            closeEditPinModal();
+            await loadAllData();
+        }
+
+        async function toggleStudentActive(id, newState, name) {
+            if (!confirm(newState ? `确定重新启用「${name}」的账号吗？` : `确定停用「${name}」的账号吗？`)) return;
+            await sbFetch(`students?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ is_active: newState }) });
+            await loadAllData();
+        }
+
+        function renderQuizUnitsGrid() {
+            const grid = document.getElementById('quiz-units-grid');
+            if (!grid || allVocab.length === 0) return;
+            const unitCounts = {};
+            allVocab.forEach(w => { unitCounts[w.category] = (unitCounts[w.category] || 0) + 1; });
+            const units = Object.keys(unitCounts);
+            grid.innerHTML = units.map(u => `
+                <label style="display:flex; align-items:center; gap:6px; background:#25252b; border:1px solid #3f3f46; border-radius:6px; padding:6px 8px; cursor:pointer; font-size:0.85em;">
+                    <input type="checkbox" class="quiz-unit-cb" value="${u}" checked onchange="updateSelectedUnitsSummary()">
+                    <span style="flex:1;">${u}</span>
+                    <span style="color:#94a3b8; font-size:0.85em;">${unitCounts[u]}题</span>
+                </label>`).join('');
+            updateSelectedUnitsSummary();
+        }
+
+        function selectUnitPreset(mode) {
+            document.querySelectorAll('.quiz-unit-cb').forEach(cb => { cb.checked = (mode === 'ALL'); });
+            updateSelectedUnitsSummary();
+        }
+
+        function updateSelectedUnitsSummary() {
+            const selected = Array.from(document.querySelectorAll('.quiz-unit-cb:checked')).map(c => c.value);
+            const poolCount = allVocab.filter(w => selected.includes(w.category)).length;
+            const qCount = parseInt(document.getElementById('quiz-qcount-input').value || '20', 10);
+            const sumEl = document.getElementById('quiz-units-summary');
+            if (selected.length === 0) { sumEl.textContent = "请至少选择一个单元"; sumEl.style.color = "#f87171"; }
+            else {
+                const actual = Math.min(qCount, poolCount);
+                sumEl.textContent = `✅ 已选 ${selected.length} 个单元，题池共 ${poolCount} 题，将随机抽取 ${actual} 题`;
+                sumEl.style.color = "#fcd34d";
+            }
+        }
+
+        function populateQuizAssignTargets() {
+            const active = allStudents.filter(s => s.is_active !== false);
+            const classes = Array.from(new Set(active.map(s => (s.class_name || '').trim()).filter(Boolean))).sort();
+            const clsSel = document.getElementById('assign-class-select');
+            if (clsSel) clsSel.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            const picker = document.getElementById('assign-students-picker');
+            if (picker) {
+                picker.innerHTML = active.map(s => `
+                    <label style="display:flex; align-items:center; gap:6px; font-size:0.84em; cursor:pointer; background:#25252b; padding:4px 8px; border-radius:6px;">
+                        <input type="checkbox" class="assign-stu-cb" value="${s.id}" onchange="updateAssignPreview()">
+                        <span>${s.display_name} <span style="color:#94a3b8;">(${s.class_name || '-'})</span></span>
+                    </label>`).join('');
+            }
+            updateAssignPreview();
+        }
+
+        function toggleAssignMode() {
+            const mode = document.querySelector('input[name="assign-mode"]:checked').value;
+            document.getElementById('assign-class-select').style.display = mode === 'CLASS' ? 'inline-block' : 'none';
+            document.getElementById('assign-students-picker').style.display = mode === 'PICK' ? 'grid' : 'none';
+            updateAssignPreview();
+        }
+
+        function getTargetStudentsForQuiz() {
+            const active = allStudents.filter(s => s.is_active !== false);
+            const mode = document.querySelector('input[name="assign-mode"]:checked').value;
+            if (mode === 'ALL') return active;
+            if (mode === 'CLASS') {
+                const cls = document.getElementById('assign-class-select').value;
+                return active.filter(s => (s.class_name || '').trim() === cls);
+            }
+            const ids = Array.from(document.querySelectorAll('.assign-stu-cb:checked')).map(c => c.value);
+            return active.filter(s => ids.includes(s.id));
+        }
+
+        function updateAssignPreview() {
+            const targets = getTargetStudentsForQuiz();
+            document.getElementById('assign-target-summary').textContent = `将派发给 ${targets.length} 位启用中的学生`;
+        }
+
+        function suggestNextQuizCode() {
+            const inp = document.getElementById('quiz-code-input');
+            if (!inp || inp.value.trim()) return;
+            let maxN = 0;
+            allQuizzes.forEach(q => {
+                const m = String(q.quiz_code || '').match(/(\d+)/);
+                if (m) maxN = Math.max(maxN, parseInt(m[1], 10));
+            });
+            inp.value = `Quiz ${String(maxN + 1).padStart(3, '0')}`;
+        }
+
+        async function createAndAssignQuiz() {
+            const msgEl = document.getElementById('create-quiz-msg');
+            const code = document.getElementById('quiz-code-input').value.trim();
+            const title = document.getElementById('quiz-title-input').value.trim();
+            const qCountReq = parseInt(document.getElementById('quiz-qcount-input').value || '20', 10);
+            const selectedUnits = Array.from(document.querySelectorAll('.quiz-unit-cb:checked')).map(c => c.value);
+            const targets = getTargetStudentsForQuiz();
+
+            if (!code) { msgEl.textContent = "❌ 请填写测验编号"; msgEl.style.color = "#f87171"; return; }
+            if (selectedUnits.length === 0) { msgEl.textContent = "❌ 请至少选择一个单元"; msgEl.style.color = "#f87171"; return; }
+            if (targets.length === 0) { msgEl.textContent = "❌ 请选择至少一位学生"; msgEl.style.color = "#f87171"; return; }
+
+            const pool = allVocab.filter(w => selectedUnits.includes(w.category));
+            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            const chosen = shuffled.slice(0, Math.min(qCountReq, shuffled.length));
+            const questionIds = chosen.map(w => w.id);
+
+            try {
+                const created = await sbFetch("quizzes_kgnd", {
+                    method: "POST",
+                    headers: { "Prefer": "return=representation" },
+                    body: JSON.stringify({ quiz_code: code, title, units: selectedUnits, question_ids: questionIds, question_count: questionIds.length })
+                });
+                const quizObj = Array.isArray(created) ? created[0] : created;
+                const assignRows = targets.map(s => ({ quiz_id: quizObj.id, quiz_code: code, student_id: s.id, username: s.username, display_name: s.display_name, status: "pending", attempt_no: 1 }));
+                await sbFetch("quiz_assignments_kgnd", { method: "POST", body: JSON.stringify(assignRows) });
+                msgEl.textContent = `✅ 已创建「${code}」并派发给 ${targets.length} 位学生！`;
+                msgEl.style.color = "#4ade80";
+                document.getElementById('quiz-code-input').value = "";
+                await loadAllData();
+            } catch (err) {
+                msgEl.textContent = "❌ 创建失败：" + err.message;
+                msgEl.style.color = "#f87171";
+            }
+        }
+
+        async function reassignToStudent(assignmentId, quizCode, stuName, currentAttempt) {
+            if (!confirm(`确定为「${stuName}」重派「${quizCode}」吗？`)) return;
+            await sbFetch(`quiz_assignments_kgnd?id=eq.${assignmentId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ status: "pending", attempt_no: (currentAttempt || 1) + 1, assigned_at: new Date().toISOString() })
+            });
+            await loadAllData();
+        }
+
+        async function assignQuizToExtraStudent(quizId, quizCode) {
+            const sel = document.getElementById(`add-stu-${quizId}`);
+            if (!sel || !sel.value) return;
+            const stuId = sel.value;
+            const existing = allAssignments.find(a => a.quiz_id === quizId && a.student_id === stuId);
+            if (existing) {
+                await sbFetch(`quiz_assignments_kgnd?id=eq.${existing.id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ status: "pending", attempt_no: (existing.attempt_no || 1) + 1, assigned_at: new Date().toISOString() })
+                });
+            } else {
+                await sbFetch("quiz_assignments_kgnd", {
+                    method: "POST",
+                    body: JSON.stringify({ quiz_id: quizId, quiz_code: quizCode, student_id: stuId, status: "pending", attempt_no: 1 })
+                });
+            }
+            await loadAllData();
+        }
+
+        function renderQuizzesList() {
+            const wrap = document.getElementById('quizzes-list-wrap');
+            if (!wrap) return;
+            if (allQuizzes.length === 0) {
+                wrap.innerHTML = `<div class="table-wrap"><div class="empty-msg">暂无已创建的测验，请在上方创建 Quiz 001。</div></div>`;
+                return;
+            }
+            const stuMap = {};
+            allStudents.forEach(s => { stuMap[s.id] = s; });
+            const activeStudents = allStudents.filter(s => s.is_active !== false);
+
+            wrap.innerHTML = allQuizzes.map(q => {
+                const assigns = allAssignments.filter(a => a.quiz_id === q.id);
+                const doneCount = assigns.filter(a => a.status === 'completed').length;
+                const unitsArr = Array.isArray(q.units) ? q.units : [];
+                const dt = q.created_at ? new Date(q.created_at).toLocaleString('zh-MY', { hour12: false }) : '-';
+                const rowsHtml = assigns.map(a => {
+                    const stu = stuMap[a.student_id] || { display_name: '(已移除)', class_name: '' };
+                    const isDone = a.status === 'completed';
+                    const statusHtml = isDone ? `<span class="pill-ok">✅ 已完成</span>` : `<span class="pill-warn">⏳ 待完成</span>`;
+                    const scoreHtml = isDone ? `<strong>${a.score_correct}/${q.question_count}</strong> <span class="${a.accuracy >= 80 ? 'pill-ok' : 'pill-err'}">${a.accuracy}%</span>` : `<span style="color:#94a3b8;">—</span>`;
+                    return `
+                        <tr>
+                            <td><strong style="color:#fb923c;">${stu.display_name}</strong> <span style="color:#94a3b8;">(${stu.class_name || '-'})</span></td>
+                            <td>第 ${a.attempt_no || 1} 次</td><td>${statusHtml}</td><td>${scoreHtml}</td>
+                            <td><button class="btn btn-outline" style="padding:3px 9px; font-size:0.8em; color:#93c5fd; border-color:#3b82f6;" onclick="reassignToStudent('${a.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}', '${String(stu.display_name).replace(/'/g, "\\'")}', ${a.attempt_no || 1})">🔁 重派</button></td>
+                        </tr>`;
+                }).join('');
+                const stuOptions = activeStudents.map(s => `<option value="${s.id}">${s.display_name} (${s.class_name || '-'})</option>`).join('');
+                return `
+                    <div class="table-wrap" style="padding:14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    <span style="font-size:1.15em; font-weight:800; color:#60a5fa;">📝 ${q.quiz_code}</span>
+                                    ${q.title ? `<span style="color:#e2e8f0; font-weight:700;">${q.title}</span>` : ''}
+                                    <span class="badge">${q.question_count} 题</span>
+                                    <span class="pill-ok">完成 ${doneCount} / ${assigns.length} 人</span>
+                                </div>
+                                <div style="font-size:0.82em; color:#94a3b8; margin-top:4px;">单元：${unitsArr.join(' 、 ')} | 创建于 ${dt}</div>
+                            </div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <select class="filter-select" id="add-stu-${q.id}" style="padding:4px 8px; font-size:0.84em;">${stuOptions}</select>
+                                <button class="btn btn-primary" style="padding:5px 10px; font-size:0.82em;" onclick="assignQuizToExtraStudent('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}')">➕ 补派</button>
+                            </div>
+                        </div>
+                        <table>
+                            <thead><tr><th>学生 (班级)</th><th>作答次数</th><th>状态</th><th>最新成绩</th><th>操作</th></tr></thead>
+                            <tbody>${rowsHtml || `<tr><td colspan="5" class="empty-msg">尚未派发给任何学生</td></tr>`}</tbody>
+                        </table>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderWrongRanking() {
+            const counts = {};
+            filteredHistory.forEach(h => {
+                const wrongs = Array.isArray(h.wrong_words) ? h.wrong_words : [];
+                wrongs.forEach(w => {
+                    const key = (w.bm || w.id || '').toLowerCase();
+                    if (!key) return;
+                    if (!counts[key]) counts[key] = { bm: w.bm || w.id, chinese: w.chinese || '', count: 0 };
+                    counts[key].count += 1;
+                });
+            });
+            const sorted = Object.values(counts).sort((a, b) => b.count - a.count);
+            document.getElementById('stat-top-wrong').textContent = sorted.length ? `高频错题：${sorted[0].bm} (${sorted[0].count}次)` : '高频错题：暂无';
+
+            const tbody = document.getElementById('wrong-tbody');
+            if (sorted.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">🌟 暂无错题记录！</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = sorted.map((w, idx) => `
+                <tr>
+                    <td><strong>#${idx + 1}</strong></td>
+                    <td style="color:#60a5fa; font-weight:800;">${w.bm}</td>
+                    <td style="color:#fb923c; font-weight:600;">${w.chinese}</td>
+                    <td><span class="pill-err">${w.count} 次</span></td>
+                </tr>`).join('');
+        }
+
+        function exportCSV() {
+            if (filteredHistory.length === 0) { alert("当前没有可导出的记录！"); return; }
+            const studentMap = {};
+            allStudents.forEach(s => { studentMap[s.id] = s; });
+            const headers = ["时间", "学生名字", "班级", "状态", "单元", "答对", "总题数", "答错次数", "正确率(%)", "用时(秒)", "错题"];
+            const rows = filteredHistory.map(h => {
+                const stu = studentMap[h.student_id] || {};
+                const answered = (h.score_correct || 0) + (h.score_wrong || 0);
+                const totalQ = h.total_questions || 20;
+                const statusLabel = answered < totalQ ? `中途退出 (${answered}/${totalQ})` : "已完成";
+                const wrongs = Array.isArray(h.wrong_words) ? h.wrong_words.map(w => w.bm || w.id).join('; ') : '';
+                return [
+                    h.played_at ? new Date(h.played_at).toLocaleString('zh-MY', { hour12: false }) : '',
+                    h.display_name || h.username, stu.class_name || '', statusLabel, h.category,
+                    h.score_correct, totalQ, h.score_wrong, h.accuracy, h.duration_seconds || 0, wrongs
+                ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+            });
+            const csv = "\uFEFF" + [headers.join(','), ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `kgnd_records_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        window.onload = () => {
+            if (sessionStorage.getItem('bm_admin_ok') === '1') {
+                document.getElementById('lock-overlay').style.display = 'none';
+                loadAllData();
+            } else {
+                document.getElementById('admin-pass-input').focus();
+            }
+        };
+    </script>
+</body>
+</html>

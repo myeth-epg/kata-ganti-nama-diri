@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华小国语人称代词连连乐 | SJK(C) Kata Ganti Nama Diri Quiz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #70e1f5 0%, #ffd194 100%);
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .game-area {
+            position: relative;
+            width: 880px;
+            max-width: 98vw;
+            min-height: 600px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f4faff 100%);
+            border: 6px solid #4CAF50;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Top Header Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+
+        .level-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .user-name-tag {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px solid #ffb300;
+            color: #b78103;
+            font-weight: 800;
+            font-size: 0.95em;
+            padding: 3px 14px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(255, 179, 0, 0.25);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-name-tag:hover {
+            transform: scale(1.04);
+            border-color: #ffa000;
+        }
+
+        .user-avatar { font-size: 1.1em; }
+
+        .level-badge {
+            background: #e8f5e9;
+            color: #1b5e20;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 1.15em;
+            font-weight: bold;
+            border: 2px solid #81c784;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score-box {
+            display: flex;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .score-item {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .score-betul { background: #c8e6c9; color: #2e7d32; }
+        .score-salah { background: #ffcdd2; color: #c62828; }
+
+        .control-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .category-select {
+            padding: 6px 12px;
+            border-radius: 14px;
+            border: 2px solid #2196F3;
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: bold;
+            font-size: 0.95em;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .top-btn {
+            background: #f5f5f5;
+            border: 2px solid #ccc;
+            border-radius: 14px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            transition: all 0.2s;
+        }
+        .top-btn:hover { background: #e0e0e0; transform: scale(1.05); }
+        .top-btn.active { background: #fff3e0; border-color: #ff9800; color: #e65100; }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 6px 0 12px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 5%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 5px;
+            transition: width 0.4s ease;
+        }
+
+        /* Instruction */
+        .instruction-box {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .instruction-text {
+            font-size: 1.2em;
+            color: #d84315;
+            font-weight: bold;
+        }
+        .sub-instruction {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Question Card */
+        .question-card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 6px 0 14px 0;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #fffdf5 0%, #f0f9ff 100%);
+            border: 4px solid #ffb300;
+            border-radius: 22px;
+            padding: 20px 26px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(255, 179, 0, 0.18);
+            position: relative;
+        }
+
+        .question-meta-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .cat-tag {
+            display: inline-block;
+            background: #ffe082;
+            color: #795548;
+            font-size: 0.85em;
+            font-weight: bold;
+            padding: 3px 12px;
+            border-radius: 12px;
+        }
+
+        .qid-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            font-size: 0.85em;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #90caf9;
+        }
+
+        .sentence-prompt {
+            font-size: 1.48em;
+            font-weight: 700;
+            color: #1a237e;
+            line-height: 1.55;
+            margin: 6px 0;
+            user-select: text;
+        }
+
+        .blank-pill {
+            display: inline-block;
+            min-width: 96px;
+            padding: 2px 14px;
+            margin: 0 4px;
+            border-bottom: 3.5px solid #ff6f00;
+            background: #fff8e1;
+            color: #e65100;
+            border-radius: 10px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            transition: all 0.25s ease;
+        }
+
+        .blank-pill.filled {
+            background: #c8e6c9;
+            border-bottom-color: #2e7d32;
+            color: #1b5e20;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+        }
+
+        /* 4 Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 3px solid #2196F3;
+            border-radius: 18px;
+            padding: 15px 18px;
+            font-size: 1.38em;
+            font-weight: bold;
+            color: #1565c0;
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 0 #1976D2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 14px;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            background: #e3f2fd;
+            box-shadow: 0 8px 0 #1565c0;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #1565c0;
+        }
+
+        .option-btn:disabled { cursor: default; }
+
+        .option-badge {
+            background: #2196F3;
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78em;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct {
+            background: #4CAF50 !important;
+            border-color: #2E7D32 !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #1B5E20 !important;
+            animation: pop 0.4s ease;
+        }
+        .option-btn.correct .option-badge { background: #1B5E20; }
+
+        .option-btn.incorrect {
+            background: #ef5350 !important;
+            border-color: #c62828 !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #b71c1c !important;
+            animation: shake 0.4s ease;
+        }
+        .option-btn.incorrect .option-badge { background: #b71c1c; }
+
+        .option-btn.grayed-out {
+            opacity: 0.48;
+            transform: scale(0.97);
+        }
+
+        /* Feedback Banner & Learning Card */
+        .feedback-area {
+            min-height: 32px;
+            text-align: center;
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .learning-card {
+            display: none;
+            background: #e8f5e9;
+            border: 2.5px solid #66bb6a;
+            border-radius: 16px;
+            padding: 14px 20px;
+            margin-top: 4px;
+            text-align: left;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .learning-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .learning-word {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: #1b5e20;
+        }
+
+        .learning-example-bm {
+            font-size: 1.05em;
+            color: #0d47a1;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+        .learning-example-zh {
+            font-size: 0.98em;
+            color: #37474f;
+            margin: 3px 0;
+        }
+        .learning-explain-zh {
+            font-size: 0.94em;
+            color: #5d4037;
+            background: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        .next-btn {
+            display: none;
+            margin: 12px auto 0 auto;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 35px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(245, 124, 0, 0.4);
+            transition: all 0.2s;
+        }
+        .next-btn:hover { transform: scale(1.06); }
+
+        /* Welcome / Login Modal */
+        .name-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 16px;
+        }
+
+        .name-modal-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 5px solid #4CAF50;
+            border-radius: 26px;
+            padding: 28px 26px;
+            width: 440px;
+            max-width: 95vw;
+            text-align: center;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+            animation: pop 0.4s ease;
+        }
+
+        .name-modal-icon { font-size: 3em; margin-bottom: 4px; }
+        .name-modal-title {
+            font-size: 1.55em;
+            font-weight: 900;
+            color: #1565c0;
+            margin: 0 0 6px 0;
+        }
+        .name-modal-subtitle {
+            font-size: 0.95em;
+            color: #555;
+            margin: 0 0 14px 0;
+        }
+
+        .name-input-box {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            border: 3px solid #2196F3;
+            border-radius: 16px;
+            outline: none;
+            color: #1a237e;
+            background: #ffffff;
+            margin-bottom: 12px;
+        }
+        .name-input-box:focus {
+            border-color: #ff9800;
+            box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.2);
+        }
+
+        .start-challenge-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 32px;
+            font-size: 1.15em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .start-challenge-btn:hover { transform: scale(1.03); }
+
+        .auth-tabs {
+            display: flex;
+            gap: 6px;
+            background: #e3f2fd;
+            padding: 5px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+        .auth-tab {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 6px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.92em;
+            color: #1565c0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .auth-tab.active {
+            background: #ffffff;
+            color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+        .auth-panel { display: none; }
+        .auth-panel.active { display: block; }
+        .auth-error {
+            color: #c62828;
+            font-size: 0.9em;
+            font-weight: bold;
+            min-height: 20px;
+            margin-bottom: 8px;
+        }
+
+        /* History Modal */
+        .history-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 210;
+            padding: 16px;
+        }
+        .history-modal-card {
+            background: #ffffff;
+            border: 5px solid #2196F3;
+            border-radius: 24px;
+            padding: 22px;
+            width: 680px;
+            max-width: 96vw;
+            max-height: 86vh;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+            animation: pop 0.3s ease;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+        .history-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .history-stat-box {
+            background: #f0f9ff;
+            border: 2px solid #bbdefb;
+            border-radius: 14px;
+            padding: 10px;
+            text-align: center;
+        }
+        .history-stat-val { font-size: 1.5em; font-weight: 900; color: #1565c0; }
+        .history-stat-lbl { font-size: 0.85em; color: #546e7a; font-weight: bold; }
+        .history-list {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+        .history-item {
+            background: #fafafa;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-weight: bold;
+        }
+        .wrong-word-pill {
+            display: inline-block;
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 2px 4px 2px 0;
+        }
+        .cloud-status-badge {
+            font-size: 0.92em;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        /* Celebration Overlay */
+        .celebrate-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.96);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 25px;
+            border-radius: 18px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .celebrate-title {
+            font-size: 2.3em;
+            color: #ff6f00;
+            margin: 8px 0;
+            font-weight: 900;
+        }
+
+        .celebrate-player-badge {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffe082 100%);
+            border: 3px solid #ffb300;
+            color: #e65100;
+            font-size: 1.5em;
+            font-weight: 900;
+            padding: 6px 26px;
+            border-radius: 24px;
+            margin: 6px 0 4px 0;
+            box-shadow: 0 4px 12px rgba(255, 179, 0, 0.28);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .celebrate-stats {
+            background: #f1f8e9;
+            border: 3px solid #8bc34a;
+            border-radius: 18px;
+            padding: 15px 30px;
+            margin: 15px 0;
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #33691e;
+            font-weight: bold;
+        }
+
+        .celebrate-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .action-round-btn {
+            padding: 12px 26px;
+            font-size: 1.15em;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .action-round-btn:hover { transform: scale(1.06); }
+
+        @keyframes pop {
+            0% { transform: scale(0.92); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 650px) {
+            body { padding: 4px; }
+            .game-area {
+                padding: 12px;
+                border-width: 4px;
+                border-radius: 18px;
+                min-height: auto;
+            }
+            .top-bar { gap: 6px; padding-bottom: 6px; }
+            .level-badge { font-size: 0.98em; padding: 5px 12px; gap: 8px; }
+            .control-buttons { gap: 5px; width: 100%; justify-content: space-between; }
+            .category-select { font-size: 0.84em; padding: 5px 8px; flex: 1; min-width: 120px; }
+            .top-btn { font-size: 0.84em; padding: 5px 8px; }
+            .sentence-prompt { font-size: 1.18em; }
+            .options-grid { grid-template-columns: 1fr; gap: 10px; }
+            .option-btn { padding: 12px 14px; font-size: 1.2em; border-radius: 14px; }
+            .celebrate-buttons { flex-direction: column; width: 90%; }
+            .action-round-btn { width: 100%; font-size: 1.05em; padding: 10px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio SFX -->
+    <audio id="sfx-correct"><source src="correct.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-wrong"><source src="wrong.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-timeout"><source src="timeout.mp3" type="audio/mpeg"></audio>
+    <audio id="bgm-music" loop><source src="bgm.mp3" type="audio/mpeg"></audio>
+
+    <div class="game-area" id="game-area">
+        <!-- Welcome / Login Modal -->
+        <div class="name-modal-overlay" id="name-modal-overlay">
+            <div class="name-modal-card">
+                <div class="name-modal-icon">🌟</div>
+                <h2 class="name-modal-title">华小国语人称代词连连乐<br><span style="font-size:0.72em; color:#2e7d32;">Kata Ganti Nama Diri</span></h2>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">🔑 学生登录</button>
+                    <button class="auth-tab" id="tab-guest" onclick="switchAuthTab('guest')">🚀 游客试玩</button>
+                </div>
+
+                <!-- Tab 1: Login -->
+                <div class="auth-panel active" id="panel-login">
+                    <p class="name-modal-subtitle">请输入老师分配的账号与密码登录，自动保存学习记录！</p>
+                    <input type="text" class="name-input-box" id="login-name-input" placeholder="登录账号 (例: johnny)" maxlength="20" onkeydown="if(event.key==='Enter') document.getElementById('login-pin-input').focus()">
+                    <input type="password" inputmode="numeric" class="name-input-box" id="login-pin-input" placeholder="密码 / PIN (例: 1234)" maxlength="12" onkeydown="if(event.key==='Enter') loginStudent()">
+                    <div class="auth-error" id="login-error"></div>
+                    <button class="start-challenge-btn" id="btn-login-submit" onclick="loginStudent()">🔑 登录并开始第一题 ➔</button>
+                </div>
+
+                <!-- Tab 2: Guest -->
+                <div class="auth-panel" id="panel-guest">
+                    <p class="name-modal-subtitle">无需账号直接练习（不保存到云端记录）</p>
+                    <input type="text" class="name-input-box" id="player-name-input" placeholder="输入你的名字 (例: Johnny / Ali)..." maxlength="15" onkeydown="if(event.key==='Enter') confirmPlayerName()">
+                    <button class="start-challenge-btn" onclick="confirmPlayerName()">🚀 开始第一题 (Start) ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student History Modal -->
+        <div class="history-modal-overlay" id="history-modal-overlay" onclick="if(event.target===this) closeHistoryModal()">
+            <div class="history-modal-card">
+                <div class="history-header">
+                    <h2 style="margin:0; color:#1565c0; font-size:1.3em;">📊 学习记录与错题本 (<span id="hist-player-title"></span>)</h2>
+                    <button class="top-btn" onclick="closeHistoryModal()">✖ 关闭</button>
+                </div>
+                <div class="history-stats-row">
+                    <div class="history-stat-box">
+                        <div class="history-stat-val" id="hist-total-rounds">0</div>
+                        <div class="history-stat-lbl">完成练习组数</div>
+                    </div>
+                    <div class="history-stat-box">
+                        <div class="history-stat-val" id="hist-avg-acc">0%</div>
+                        <div class="history-stat-lbl">平均正确率</div>
+                    </div>
+                    <div class="history-stat-box">
+                        <div class="history-stat-val" id="hist-total-correct">0</div>
+                        <div class="history-stat-lbl">累计答对题数</div>
+                    </div>
+                </div>
+                <div class="history-list" id="history-list">
+                    <p style="text-align:center; color:#777;">正在加载记录...</p>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid #eee;">
+                    <span id="hist-account-mode" style="font-size:0.88em; color:#546e7a; font-weight:bold;"></span>
+                    <button class="top-btn" onclick="switchAccount()">🔄 切换账号 / 退出登录</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mid-Quiz Quit Warning Modal -->
+        <div class="history-modal-overlay" id="quit-warn-overlay" style="z-index:220;">
+            <div class="history-modal-card" style="max-width:440px; text-align:center; padding:24px 22px;">
+                <div style="font-size:2.6em; margin-bottom:6px;">⚠️</div>
+                <h2 style="margin:0 0 8px 0; color:#e65100; font-size:1.35em;">测验尚未完成！(Quiz Not Finished)</h2>
+                <p style="margin:0 0 14px 0; color:#455a64; font-size:0.95em;">你正在作答中，确定要中途退出吗？</p>
+                <div style="background:#fff8e1; border:2px solid #ffe082; border-radius:14px; padding:14px; margin-bottom:16px;">
+                    <div style="font-size:1.25em; font-weight:900; color:#1565c0; margin-bottom:6px;" id="quit-warn-progress">当前进度：0 / 20</div>
+                    <div style="font-size:1.05em; font-weight:800; display:flex; justify-content:center; gap:18px;">
+                        <span style="color:#2e7d32;">✅ 答对：<span id="quit-warn-correct">0</span></span>
+                        <span style="color:#c62828;">❌ 答错：<span id="quit-warn-wrong">0</span></span>
+                    </div>
+                </div>
+                <p style="margin:0 0 16px 0; font-size:0.85em; color:#78909c;">☁️ 当前作答进度与错题已实时保存至云端。</p>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                    <button class="action-round-btn" style="background:linear-gradient(135deg,#43a047,#2e7d32); padding:10px 22px; font-size:1em;" onclick="cancelQuitQuiz()">▶️ 继续作答 (Continue)</button>
+                    <button class="action-round-btn" style="background:linear-gradient(135deg,#e53935,#c62828); padding:10px 22px; font-size:1em;" onclick="confirmQuitQuiz()">🚪 确定退出 (Quit)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top status bar -->
+        <div class="top-bar">
+            <div class="level-wrapper">
+                <div class="user-name-tag" id="user-name-display" title="点击可修改名字" onclick="editUserName()">
+                    <span class="user-avatar">👤</span> <span id="display-user-name"></span>
+                </div>
+                <div class="level-badge">
+                    <span id="level-text">第 1 题 / 共 20 题</span>
+                    <div class="score-box">
+                        <span class="score-item score-betul">✅ <span id="score-b">0</span></span>
+                        <span class="score-item score-salah">❌ <span id="score-s">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-buttons">
+                <select class="category-select" id="category-filter" onchange="onCategoryFilterChange()">
+                    <option value="ALL">🌟 全部题目 (All)</option>
+                </select>
+
+                <button class="top-btn" id="history-btn" onclick="openHistoryModal()">📊 记录</button>
+                <button class="top-btn" id="sfx-toggle-btn" onclick="toggleSFX()">🔊 音效</button>
+                <button class="top-btn" id="bgm-toggle-btn" onclick="toggleBGM()">🎵 音乐</button>
+                <button class="top-btn" id="quit-quiz-btn" style="color:#c62828; border-color:#ef9a9a;" onclick="requestQuitQuiz('reset')">🚪 退出</button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Assigned Quiz Banner -->
+        <div id="assigned-quiz-banner" style="display:none; background:linear-gradient(135deg,#e3f2fd,#ede7f6); border:2px solid #5c6bc0; border-radius:14px; padding:10px 14px; margin:8px 0; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div id="assigned-quiz-text" style="font-weight:800; color:#283593; font-size:0.95em;"></div>
+            <div id="assigned-quiz-actions" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instruction-box">
+            <div class="instruction-text">请细读句子，选出最正确的人称代词 (Kata Ganti Nama Diri) 填入空格！</div>
+            <div class="sub-instruction">Baca ayat di bawah dan pilih Kata Ganti Nama Diri yang paling sesuai.</div>
+        </div>
+
+        <!-- Central Question Prompt (Fill-in-the-Blank Sentence) -->
+        <div class="question-card-container">
+            <div class="question-card" id="question-card">
+                <div class="question-meta-row">
+                    <span class="cat-tag" id="cat-tag">Group A</span>
+                    <span class="qid-tag" id="qid-tag">A001</span>
+                </div>
+                <div class="sentence-prompt" id="sentence-prompt">...</div>
+            </div>
+        </div>
+
+        <!-- 4 Multiple Choice Options -->
+        <div class="options-grid" id="options-grid"></div>
+
+        <!-- Feedback & Learning Card -->
+        <div class="feedback-area" id="feedback-banner"></div>
+
+        <div class="learning-card" id="learning-card">
+            <div class="learning-card-header">
+                <span class="learning-word">✅ 正确答案：<span id="card-answer"></span></span>
+            </div>
+            <div class="learning-example-bm" id="card-complete-bm"></div>
+            <div class="learning-example-zh" id="card-translation-zh"></div>
+            <div class="learning-explain-zh" id="card-explain-zh"></div>
+        </div>
+
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 (Next Question) ➔</button>
+
+        <!-- Celebration Screen -->
+        <div class="celebrate-overlay" id="celebrate-screen">
+            <div style="font-size: 4em; margin-bottom: 4px;">🏆🎉</div>
+            <div class="celebrate-player-badge">👤 <span id="celebrate-player-name">同学</span></div>
+            <h1 class="celebrate-title">Tahniah! 恭喜完成本组练习！</h1>
+            <p style="font-size: 1.15em; color: #555; margin: 4px 0;"><strong id="final-user-name"></strong> 太棒了！你已经掌握了这些国语人称代词！</p>
+            <div class="celebrate-stats">
+                ✅ 一次答对：<span id="final-correct">0</span> / <span id="final-total">20</span> 题<br>
+                ❌ 答错次数：<span id="final-wrong">0</span> 次<br>
+                🎯 正确率：<span id="final-accuracy">100%</span>
+            </div>
+            <div class="cloud-status-badge" id="cloud-save-status">☁️ 正在同步成绩...</div>
+            <div class="celebrate-buttons">
+                <button class="action-round-btn" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);" onclick="startNewSet()">▶️ 开始新的一组 20 题 (New Set)</button>
+                <button class="action-round-btn" style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);" onclick="repeatCurrentSet()">🔄 重温本组 20 题 (Repeat Set)</button>
+                <button class="action-round-btn" style="background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);" onclick="openHistoryModal()">📊 我的记录 (History)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embedded Fallback Data -->
+    <script id="embedded-data" type="application/json">
+[{"id": "A001", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "( ________ ) berjanji akan belajar bersungguh-sungguh demi mencapai keputusan yang cemerlang dalam peperiksaan.", "answer": "Saya", "distractors": ["Kamu", "Beliau", "Mereka"], "explanation_zh": "第一人称单数代词（我），用于向老师、长辈或正式场合表达自己的承诺。", "translation_zh": "我承诺会努力学习，以在考试中取得优异的成绩。"}, {"id": "A002", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Bilakah ( ________ ) akan bertolak ke Kuala Lumpur?\" tanya Encik Razak kepada rakan sekerjanya.", "answer": "kamu", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称单数代词（你），用于直接询问对方（同事）何时出发。", "translation_zh": "“你什么时候出发去吉隆坡？”拉扎克先生问他的同事。"}, {"id": "A003", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Sultan Mahmud telah berangkat ke majlis perasmian itu dan ( ________ ) diiringi oleh beberapa orang pembesar negeri.", "answer": "baginda", "distractors": ["beliau", "tuanku", "beta"], "explanation_zh": "第三人称尊称代词（陛下/殿下），专门用来指代苏丹、国王或王室成员。", "translation_zh": "苏丹马末已启程前往开幕典礼，多位州大臣随行护送。"}, {"id": "A004", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Ampun tuanku, ( ________ ) menjunjung titah perintah tuanku,\" sembah Laksamana Hang Tuah.", "answer": "patik", "distractors": ["beta", "saya", "hamba"], "explanation_zh": "第一人称谦称代词（臣/微臣），古代臣子或百姓向苏丹/国王说话时自称。", "translation_zh": "“启禀陛下，微臣谨遵陛下的旨意。”海军统帅汉都亚叩拜道。"}, {"id": "A005", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Murid-murid tahun enam itu sangat rajin dan ( ________ ) sering mendapat pujian daripada guru besar.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代前文提到的“六年级学生们”（Murid-murid）。", "translation_zh": "那些六年级学生非常勤奋，他们经常得到校长的称赞。"}, {"id": "A006", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Sebagai rakyat yang cinta akan negara, ( ________ ) hendaklah sentiasa mematuhi undang-undang.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），用于呼吁大家共同遵守法律。", "translation_zh": "作为热爱国家的公民，我们应当时刻遵守法律。"}, {"id": "A007", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Wahai rakyat jelata, ( ________ ) berharap agar semua penduduk hidup dalam keadaan aman dan damai,\" titah Sultan Ahmad.", "answer": "beta", "distractors": ["patik", "baginda", "tuanku"], "explanation_zh": "第一人称皇室自称（朕/孤），专门用于苏丹或国王对臣民说话时的自称。", "translation_zh": "“亲爱的子民们，朕希望所有居民都能生活在安宁与和平之中。”苏丹阿末谕示道。"}, {"id": "A008", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Mengapakah ( ________ ) datang lewat ke latihan bola jaring petang ini?\" tanya Cikgu Suraya kepada Ali.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），苏拉雅老师直接问阿里一个人为何迟到。", "translation_zh": "“为什么你今天下午的英式女篮训练迟到了？”苏拉雅老师问阿里。"}, {"id": "A009", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Encik Lim seorang dermawan yang terkenal dan ( ________ ) sering menghulurkan bantuan kepada anak-anak yatim.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他/她），用于指代受人尊敬的长辈、老师、医生或慈善家（Encik Lim）。", "translation_zh": "林先生是一位著名的慈善家，他经常向孤儿伸出援手。"}, {"id": "A010", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Ayah, bolehkah ( ________ ) meminjam basikal abang untuk ke kedai?\" tanya Adib kepada ayahnya.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），阿迪礼貌地向父亲自称并请求借用脚踏车。", "translation_zh": "“爸爸，我可以借哥哥的脚踏车去商店吗？”阿迪问他的爸爸。"}, {"id": "A011", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "( ________ ) berdua akan mewakili sekolah dalam pertandingan bahas peringkat daerah pada minggu hadapan.", "answer": "Kami", "distractors": ["Mereka", "Kalian", "Saya"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），表示“我们两个人”将代表学校参赛。", "translation_zh": "我们两人将在下周代表学校参加县级辩论比赛。"}, {"id": "A012", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Sila duduk di tempat masing-masing sementara ( ________ ) mengambil buku kehadiran,\" kata ketua kelas kepada rakan-rakannya.", "answer": "saya", "distractors": ["kalian", "mereka", "beliau"], "explanation_zh": "第一人称单数代词（我），班长请同学们先坐好，自己（我）去拿点名簿。", "translation_zh": "“请大家先回到各自的座位坐好，我去拿点名簿。”班长对同学们说。"}, {"id": "A013", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Perdana Menteri akan merasmikan kempen kebersihan itu dan ( ________ ) dijadualkan tiba pada pukul 9:00 pagi.", "answer": "beliau", "distractors": ["baginda", "dia", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代国家领袖、部长或受尊敬的人士（Perdana Menteri 首相）。", "translation_zh": "首相将为该清洁运动主持开幕，他预计于上午9时抵达。"}, {"id": "A014", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Janganlah ( ________ ) bersedih lagi, segala yang berlaku pasti ada hikmahnya,\" pujuk Aina kepada sahabatnya.", "answer": "kamu", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称单数代词（你），艾娜安慰她的好朋友（一个人）不要再难过。", "translation_zh": "“你别再难过了，凡事发生必有其深意。”艾娜安慰她的好友。"}, {"id": "A015", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Para pekerja kilang itu sedang mogok kerana ( ________ ) tidak berpuas hati dengan bayaran gaji yang rendah.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代前文的“工厂工人们”（Para pekerja kilang）。", "translation_zh": "那些工厂工人正在罢工，因为他们对微薄的薪资感到不满。"}, {"id": "A016", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Daulat tuanku, semoga ( ________ ) sentiasa dikurniakan kesihatan yang baik,\" ucap Datuk Bendahara.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），臣子直接向苏丹或国王祝祷时使用“tuanku”。", "translation_zh": "“吾王万岁，愿陛下永远身体健康。”宰相（拿督盘陀诃罗）祝贺道。"}, {"id": "A017", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "( ________ ) mestilah menghormati ibu bapa dan guru-guru yang telah banyak berjasa kepada kita.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），与句末的“kita”前后呼应。", "translation_zh": "我们必须尊敬对我们付出良多的父母和老师们。"}, {"id": "A018", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Saya berasal dari negeri Pahang. Bolehkah ( ________ ) tahu nama tempat ini?\" tanya pengembara itu.", "answer": "saya", "distractors": ["kamu", "dia", "kita"], "explanation_zh": "第一人称单数代词（我），旅人礼貌地向人询问：“我可以知道这个地方的名字吗？”", "translation_zh": "“我来自彭亨州。请问我可以知道这个地方的名称吗？”那位旅人问道。"}, {"id": "A019", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Puan Salmah merupakan guru disiplin di sekolah ini dan ( ________ ) sangat tegas tetapi penyayang.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代受人尊敬的老师（Puan Salmah）。", "translation_zh": "萨尔玛女士是这所学校的纪律老师，她非常严厉但充满爱心。"}, {"id": "A020", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Jika ( ________ ) tidak faham tentang topik ini, sila angkat tangan untuk bertanya,\" pesan Cikgu Hafiz kepada murid-muridnya.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），哈菲兹老师对全班“同学们”（murid-muridnya）说话。", "translation_zh": "“如果你们对这个课题有不明白的地方，请举手提问。”哈菲兹老师叮嘱学生们。"}, {"id": "A021", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Mei Ling dan Siti sedang mengulang kaji pelajaran di perpustakaan kerana ( ________ ) akan menduduki ujian esok.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（她们），指代“美玲和茜蒂”（Mei Ling dan Siti）两个人。", "translation_zh": "美玲和茜蒂正在图书馆温习功课，因为她们明天要参加测验。"}, {"id": "A022", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Mak, ( ________ ) laparlah. Bilakah makanan tengah hari akan siap?\" rengek adik yang baru pulang dari tadika.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），弟弟刚从幼儿园放学回家，向妈妈撒娇说“我饿了”。", "translation_zh": "“妈妈，我好饿啊。午餐什么时候准备好？”刚从幼儿园回家的弟弟撒娇道。"}, {"id": "A023", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Walaupun sudah berjaya menjadi doktor, ( ________ ) tidak pernah melupakan jasa kedua-dua ibu bapanya.", "answer": "beliau", "distractors": ["saya", "mereka", "baginda"], "explanation_zh": "第三人称尊称代词（他/她），用于指代有成就、受尊敬的人士（医生）。", "translation_zh": "尽管已经成功成为一名医生，他从未忘记父母亲的养育之恩。"}, {"id": "A024", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Wahai saudara-saudaraku, marilah ( ________ ) berganding bahu membersihkan kawasan surau ini,\" seru ketua kampung.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），“marilah kita”意为“让我们一起……”。", "translation_zh": "“各位乡亲父老们，让我们一起携手清理这间祈祷室的周围环境吧！”村长号召道。"}, {"id": "A025", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Penjenayah yang berbahaya itu akhirnya berjaya diberkas oleh pihak polis setelah ( ________ ) bersembunyi di dalam hutan.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），罪犯（Penjenayah）不应用尊称“beliau”，因此使用普通第三人称“dia”。", "translation_zh": "那名危险的罪犯在躲藏于森林之中后，最终成功被警方逮捕。"}, {"id": "A026", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Ibu, ( ________ ) hendak keluar bermain bola sepak di padang sebentar,\" kata Haikal kepada ibunya.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），海卡尔向母亲报备自己要出去草场踢一会儿足球。", "translation_zh": "“妈妈，我要出去草场踢一会儿足球。”海卡尔对他的妈妈说。"}, {"id": "A027", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Doktor Amirul merawat pesakitnya dengan penuh dedikasi kerana ( ________ ) sangat komited dengan tugasnya.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人尊敬的专业人士（阿米鲁医生）。", "translation_zh": "阿米鲁医生全心全意地治疗病人，因为他对自己的职责非常敬业。"}, {"id": "A028", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"( ________ ) tidak tahu apa-apa tentang kehilangan dompet itu, cikgu,\" kata Faris membela dirinya.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Beliau"], "explanation_zh": "第一人称单数代词（我），法里斯在老师面前为自己辩解时礼貌地自称“Saya”。", "translation_zh": "“老师，我对钱包遗失的事一无所知。”法里斯为自己辩护道。"}, {"id": "A029", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Sila beratur dengan tertib sebelum ( ________ ) menaiki bas sekolah,\" arah pengawas sekolah itu kepada murid-murid sekolah.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），巡察员对着一群“学生们”（murid-murid）发出指示。", "translation_zh": "“在上校车之前，请你们有序排队。”那位学校巡察员指示学生们。"}, {"id": "A030", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Datuk Seri Anwar merupakan tokoh korporat yang disegani dan ( ________ ) telah banyak menyumbang kepada ekonomi negara.", "answer": "beliau", "distractors": ["baginda", "dia", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人敬重的企业界名人或领袖。", "translation_zh": "拿督斯里安华是一位备受尊敬的企业界人物，他为国家经济做出了巨大贡献。"}, {"id": "A031", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Mari ( ________ ) pergi ke kantin bersama-sama pada waktu rehat nanti,\" ajak Raju kepada Daniel.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），“Mari kita”意为“我们一起……吧”。", "translation_zh": "“待会休息时间我们一起去食堂吧。”拉朱邀请丹尼尔。"}, {"id": "A032", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Puteri Bongsu sedang bersiram di taman bunga dan ( ________ ) ditemani oleh dayang-dayang istana.", "answer": "baginda", "distractors": ["beliau", "tuanku", "beta"], "explanation_zh": "第三人称皇室尊称（殿下），用于指代公主（Puteri Bongsu）等王室成员。", "translation_zh": "小公主正在花园里沐浴，宫女们在旁陪伴着殿下。"}, {"id": "A033", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"( ________ ) berjanji akan menjaga rahsia ini dengan sebaik-baiknya,\" kata Kamal dan Hafiz kepada Zaki.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者 Zaki），卡马尔和哈菲兹两人共同向扎基承诺。", "translation_zh": "“我们保证会好好守住这个秘密。”卡马尔和哈菲兹对扎基说。"}, {"id": "A034", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Mengapakah ( ________ ) menangis teresak-esak di tepi jalan ini, adik?\" tanya seorang wanita kepada budak kecil itu.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），那位女士直接问路边正在哭泣的小孩（一个人）。", "translation_zh": "“小朋友，你为什么在路边哭得这么伤心？”一位女士问那个小孩。"}, {"id": "A035", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Ibu bapa memainkan peranan penting kerana ( ________ ) merupakan suri teladan yang paling dekat dengan anak-anak.", "answer": "mereka", "distractors": ["kami", "kita", "beliau"], "explanation_zh": "第三人称复数代词（他们），指代“父母亲”（Ibu bapa，两个人）。", "translation_zh": "父母扮演着重要的角色，因为他们是孩子最亲近的榜样。"}, {"id": "A036", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Ampun tuanku, beribu-ribu ampun, sembah ( ________ ) harap diampun,\" ucap Tun Perak di hadapan Sultan.", "answer": "patik", "distractors": ["beta", "tuanku", "saya"], "explanation_zh": "第一人称谦称代词（臣/微臣），敦霹雳在苏丹面前请罪时使用“patik”。", "translation_zh": "“启禀陛下，万望恕罪，微臣恳请陛下宽恕。”敦霹雳在苏丹面前禀告道。"}, {"id": "A037", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"( ________ ) akan memastikan pasukan rumah sukan kita menjadi johan pada tahun ini,\" ikrar ketua rumah merah.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括全队队员），与句中的“rumah sukan kita”相呼应。", "translation_zh": "“我们一定会确保我们的运动队伍在今年夺得冠军。”红队队长宣誓道。"}, {"id": "A038", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Bilakah ( ________ ) akan memulangkan buku cerita yang dipinjam tempoh hari?\" tanya Nabila kepada Mei Hua.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），娜比拉直接询问美华（一个人）何时归还故事书。", "translation_zh": "“你什么时候归还前几天借的故事书？”娜比拉问美华。"}, {"id": "A039", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "Tun Dr. Mahathir merupakan bekas Perdana Menteri Malaysia dan ( ________ ) digelar Bapa Pemodenan.", "answer": "beliau", "distractors": ["baginda", "dia", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人尊敬的前首相敦马哈迪医生。", "translation_zh": "敦马哈迪医生是马来西亚前首相，他被称为“现代化之父”。"}, {"id": "A040", "group": "A", "category": "Group A: Kata Ganti Nama Diri", "sentence": "\"Marilah ( ________ ) berdoa agar negara kita sentiasa dilindungi daripada sebarang bencana,\" kata imam masjid itu kepada para jemaah.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括伊玛目与所有信徒），“Marilah kita”意为“让我们一起……”。", "translation_zh": "“让我们一起祈祷，愿我们的国家永远免受任何灾难的侵袭。”清真寺伊玛目对信众们说。"}, {"id": "B001", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Cikgu, bolehkah ( ________ ) keluar ke tandas sebentar?\" tanya Wei Ming kepada Cikgu Lim.", "answer": "saya", "distractors": ["kamu", "dia", "beliau"], "explanation_zh": "第一人称单数代词（我），伟明礼貌地向林老师请求去洗手间。", "translation_zh": "“老师，我可以出去上一下洗手间吗？”伟明问林老师。"}, {"id": "B002", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Cikgu Siti telah mengajar di sekolah ini selama dua puluh tahun dan ( ________ ) sangat disayangi oleh murid-murid.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代受人尊敬的老师（Cikgu Siti）。", "translation_zh": "西蒂老师在这所学校执教已有二十年，她深受学生们的爱戴。"}, {"id": "B003", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Penduduk kampung itu bergotong-royong membersihkan longkang supaya kawasan ( ________ ) bebas daripada nyamuk Aedes.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代前文的“甘榜居民”（Penduduk kampung）。", "translation_zh": "那个甘榜的居民合力清理水沟，以使他们的居住环境免受黑斑蚊滋扰。"}, {"id": "B004", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Marilah ( ________ ) sama-sama menjaga kebersihan taman permainan ini,\" kata Mei Fen kepada kawan-kawannya.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），“Marilah kita”表示邀请大家一起行动。", "translation_zh": "“让我们一起维护这个游乐场的清洁吧！”美芬对朋友们说。"}, {"id": "B005", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) sekeluarga akan bercuti ke Pulau Langkawi pada cuti sekolah yang akan datang.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），表示“我们一家人”要去度假。", "translation_zh": "我们一家人将在即将到来的学校假期前往浮罗交怡度假。"}, {"id": "B006", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Sultan Selangor telah berkenan merasmikan jambatan baharu itu dan ( ________ ) turut meluangkan masa beramah mesra dengan rakyat.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室尊称（陛下），用于叙述苏丹或国王的举动。", "translation_zh": "雪兰莪苏丹御准为那座新桥主持开幕，陛下也抽空与民众亲切交流。"}, {"id": "B007", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Wahai para pembesar, ( ________ ) mahu negara kita sentiasa aman dan makmur,\" titah Sultan Mansor.", "answer": "beta", "distractors": ["patik", "baginda", "tuanku"], "explanation_zh": "第一人称皇室自称（朕/孤），苏丹曼苏尔向大臣们发表谕令时使用。", "translation_zh": "“众位大臣，朕希望我们的国家永远和平繁荣。”苏丹曼苏尔谕示道。"}, {"id": "B008", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Ampun tuanku, ( ________ ) akan melaksanakan segala perintah tuanku dengan segera,\" sembah Hang Lekir.", "answer": "patik", "distractors": ["beta", "saya", "hamba"], "explanation_zh": "第一人称谦称代词（微臣），臣子向苏丹禀告时自称“patik”。", "translation_zh": "“启禀陛下，微臣将立即执行陛下的所有命令。”汉勒基尔叩拜道。"}, {"id": "B009", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Segala titah perintah ( ________ ) akan patik laksanakan dengan penuh taat setia,\" ucap Bendahara Tun Perak.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），臣子直接称呼眼前的苏丹或国王时使用“tuanku”。", "translation_zh": "“陛下的所有谕令，微臣必将尽忠职守地执行。”宰相敦霹雳说道。"}, {"id": "B010", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Pastikan ( ________ ) membawa alat tulis yang lengkap pada hari peperiksaan nanti,\" pesan guru kelas kepada murid-muridnya.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），班主任叮嘱全班多位学生（murid-muridnya）。", "translation_zh": "“确保你们在考试当天携带齐全的文具。”级任老师叮嘱学生们。"}, {"id": "B011", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Mengapakah ( ________ ) tidak dijemput ke majlis hari lahir kamu semalam?\" tanya Amir kepada sahabat karibnya, Johan.", "answer": "aku", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），用于关系非常亲密的好友（sahabat karib）之间交谈。", "translation_zh": "“为什么昨天你的生日派对没有邀请我？”阿米尔问他的挚友约翰。"}, {"id": "B012", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Bilakah ( ________ ) hendak menghantar buku latihan Matematik kepada Cikgu Tan?\" tanya Farah kepada sahabatnya, Siti.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），用于同辈朋友之间亲切礼貌地询问对方。", "translation_zh": "“你什么时候要交数学练习簿给陈老师？”法拉问她的朋友茜蒂。"}, {"id": "B013", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Sila pastikan ( ________ ) memakai tali pinggang keledar semasa memandu,\" pesan pihak polis kepada orang ramai.", "answer": "anda", "distractors": ["saya", "mereka", "beliau"], "explanation_zh": "第二人称正式代词（您/各位），常用于官方通告、广告或警方对公众的提醒。", "translation_zh": "“请确保您在驾驶时系好安全带。”警方提醒广大民众。"}, {"id": "B014", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Adik menangis dengan kuat kerana ( ________ ) terjatuh dari basikal di halaman rumah.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他/她），用于指代普通人或小孩（Adik 弟弟/妹妹）。", "translation_zh": "弟弟大声哭泣，因为他在屋前院子从脚踏车上摔了下来。"}, {"id": "B015", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Dato' Lee Chong Wei merupakan bekas pemain badminton negara yang terkenal dan ( ________ ) telah mengharumkan nama Malaysia.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人敬重的国家体坛名将（拿督李宗伟）。", "translation_zh": "拿督李宗伟是著名的前国家羽毛球选手，他为马来西亚争光。"}, {"id": "B016", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) mestilah mengamalkan gaya hidup sihat dengan bersenam sekurang-kurangnya tiga kali seminggu.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），倡导大家共同保持健康生活。", "translation_zh": "我们必须通过每周至少运动三次来实践健康的生活方式。"}, {"id": "B017", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Cikgu, ( ________ ) berlima telah menyiapkan tugasan projek Sains ini,\" kata ketua kumpulan kepada Cikgu Zaki.", "answer": "kami", "distractors": ["kita", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的老师），组长代表五位组员向老师汇报。", "translation_zh": "“老师，我们五个人已经完成了这项科学专题作业。”组长对扎基老师说。"}, {"id": "B018", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Kanak-kanak itu kelihatan sangat gembira semasa ( ________ ) bermain layang-layang di tepi pantai.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代前文的复数名词“Kanak-kanak”（孩子们）。", "translation_zh": "那些孩子们在海边放风筝时看起来非常开心。"}, {"id": "B019", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Di manakah ( ________ ) meletakkan kunci rumah kita tadi?\" tanya Karim kepada adiknya, Rahim.", "answer": "engkau", "distractors": ["aku", "dia", "kami"], "explanation_zh": "第二人称单数代词（你），哥哥卡林对亲弟弟拉欣说话时使用较为亲近随意的“engkau”。", "translation_zh": "“你刚才把我们家的钥匙放在哪里了？”卡林问他的弟弟拉欣。"}, {"id": "B020", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Maafkan ( ________ ), mak cik. Saya tidak sengaja terpijak kaki mak cik,\" kata budak perempuan itu dengan sopan.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），小女孩礼貌地向阿姨道歉，与下文的“Saya”一致。", "translation_zh": "“对不起，阿姨。我不是故意踩到您的脚的。”那位小女孩有礼貌地说。"}, {"id": "B021", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) sedang bersemayam di atas singgahsana sambil mendengar sembah daripada para pembesar.", "answer": "Baginda", "distractors": ["Beliau", "Beta", "Patik"], "explanation_zh": "第三人称皇室尊称（陛下），“bersemayam di atas singgahsana”（端坐在宝座上）为皇室专用动词。", "translation_zh": "陛下正端坐在宝座上，聆听众大臣的禀报。"}, {"id": "B022", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) dilantik sebagai Guru Besar Sekolah Jenis Kebangsaan Cina Chung Hua pada awal tahun ini.", "answer": "Beliau", "distractors": ["Dia", "Baginda", "Mereka"], "explanation_zh": "第三人称尊称代词（他/她），用于指代受人尊敬的校长（Guru Besar）。", "translation_zh": "他/她于今年初被委任为中华华小的校长。"}, {"id": "B023", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) sedang berlatih bersungguh-sungguh untuk menghadapi perlawanan bola keranjang esok.", "answer": "Mereka", "distractors": ["Kami", "Saya", "Beliau"], "explanation_zh": "第三人称复数代词（他们），篮球队比赛需要多人参赛，故用复数“Mereka”。", "translation_zh": "他们正在努力训练，以迎接明天的篮球比赛。"}, {"id": "B024", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Mengapakah muka ( ________ ) kelihatan pucat hari ini, Hui Ling?\" tanya Cikgu Nora dengan penuh prihatin.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），诺拉老师关切地询问慧玲一个人为何脸色苍白。", "translation_zh": "“慧玲，为什么你今天脸色看起来这么苍白？”诺拉老师关切地问道。"}, {"id": "B025", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Izinkan ( ________ ) berehat di pondok ini buat seketika kerana hari sudah senja,\" kata pengembara itu kepada pemilik pondok.", "answer": "hamba", "distractors": ["beta", "tuanku", "beliau"], "explanation_zh": "第一人称古典谦称（在下/小人），古代或古典故事中平民百姓互相交谈时谦虚自称“hamba”。", "translation_zh": "“天色已晚，请允许在下在这间茅屋暂歇片刻。”那位旅人对屋主说道。"}, {"id": "B026", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Walaupun Ahmad sering diejek oleh rakan-rakannya, ( ________ ) tetap bersabar dan tidak pernah berputus asa.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代同辈学生阿末（Ahmad）。", "translation_zh": "尽管阿末经常被同学们嘲笑，他依然保持耐心，从不轻言放弃。"}, {"id": "B027", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Ayuh, ( ________ ) bersihkan kelas ini bersama-sama sebelum loceng berbunyi!\" ajak ketua darjah kepada rakan sekelasnya.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括班长与全班同学），号召大家一起打扫课室。", "translation_zh": "“来吧，让我们在铃声响起前一起打扫这间课室！”班长号召全班同学。"}, {"id": "B028", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Ibu, bolehkah ( ________ ) berdua pergi ke rumah nenek pada hujung minggu ini?\" tanya Aiman dan adiknya.", "answer": "kami", "distractors": ["kita", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的妈妈），艾曼和弟弟两人一起向妈妈请求。", "translation_zh": "“妈妈，这个周末我们两人可以去奶奶家吗？”艾曼和弟弟问道。"}, {"id": "B029", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Semua murid tahun lima dikehendaki berkumpul di dewan kerana ( ________ ) akan mendengar ceramah kesihatan,\" kata juruacara.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），司仪直接对全体五年级学生广播指示。", "translation_zh": "“所有五年级学生请到礼堂集合，因为你们将聆听健康讲座。”司仪说道。"}, {"id": "B030", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Jika diizinkan oleh tuanku, ( ________ ) ingin memohon cuti selama tiga hari,\" sembah Panglima Awang.", "answer": "patik", "distractors": ["beta", "saya", "baginda"], "explanation_zh": "第一人称谦称代词（微臣），将军阿旺向苏丹/陛下请假时必须自称“patik”。", "translation_zh": "“若蒙陛下恩准，微臣想请假三天。”阿旺将军叩禀道。"}, {"id": "B031", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Oleh sebab jasa bakti kalian, ( ________ ) akan mengurniakan pingat kebesaran,\" titah Sultan Iskandar.", "answer": "beta", "distractors": ["patik", "tuanku", "baginda"], "explanation_zh": "第一人称皇室自称（朕），苏丹依斯干达封赏有功之臣时自称“beta”。", "translation_zh": "“鉴于你们的功绩，朕将赐予勋章。”苏丹依斯干达谕示道。"}, {"id": "B032", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Rakyat jelata amat menyayangi ( ________ ) kerana pemerintahan yang adil dan saksama,\" ucap seorang menteri kepada Sultan.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），大臣面对苏丹当面赞颂时称呼“tuanku”。", "translation_zh": "“百姓们非常爱戴陛下，因为陛下治国有方、公正不阿。”一位大臣对苏丹说道。"}, {"id": "B033", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) suka membaca buku cerita berbahasa Melayu pada waktu lapang untuk menambahkan ilmu pengetahuan.", "answer": "Saya", "distractors": ["Kamu", "Beliau", "Mereka"], "explanation_zh": "第一人称单数代词（我），句首用于自我介绍或陈述个人兴趣爱好。", "translation_zh": "我喜欢在空闲时间阅读马来文故事书以增加知识。"}, {"id": "B034", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Menteri Pendidikan itu akan melawat ke sekolah kami minggu hadapan dan ( ________ ) akan merasmikan bangunan baharu.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他/她），用于指代教育部长（Menteri Pendidikan）等国家领导人。", "translation_zh": "教育部长下周将莅临我校访问，并主持新教学楼的开幕仪式。"}, {"id": "B035", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Encik Tan dan Puan Lim sangat bangga apabila anak-anak ( ________ ) berjaya melanjutkan pelajaran ke universiti.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“陈先生和林女士”（Encik Tan dan Puan Lim）夫妇二人。", "translation_zh": "当他们的孩子成功升入大学深造时，陈先生和林女士感到非常自豪。"}, {"id": "B036", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Kucing kesayangan Aini hilang semalam, tetapi ( ________ ) berjaya menemuinya semula di belakang rumah.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（她），指代女孩艾妮（Aini）成功找回了心爱的猫咪。", "translation_zh": "艾妮心爱的猫咪昨天走失了，但她成功在屋后重新找到了它。"}, {"id": "B037", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Burung kakak tua itu sangat bijak kerana ( ________ ) boleh meniru suara manusia.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），专门用于指代动物、植物或无生命的事物（鹦鹉）。", "translation_zh": "那只鹦鹉非常聪明，因为它能够模仿人类的声音。"}, {"id": "B038", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) tidak dapat menghadiri majlis perkahwinan itu kerana terpaksa pulang ke kampung pada hari yang sama.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者/主人家），说明“我们”因回乡而无法出席婚礼。", "translation_zh": "我们无法出席那场婚礼，因为当天必须赶回乡下。"}, {"id": "B039", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Hadiah misteri menanti ( ________ ) jika berjaya menjawab semua soalan kuiz ini dengan betul!\" seru pengacara rancangan itu.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式/大众代词（您/各位观众），节目主持人面向广大观众或参与者时常用“anda”。", "translation_zh": "“只要您成功答对所有问答题目，神秘礼物正等着您！”节目主持人热情地说道。"}, {"id": "B040", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Sudikah ( ________ ) menemani saya ke kedai buku selepas waktu sekolah nanti?\" tanya Mei Mei kepada kawan baiknya.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），美美礼貌地询问她的好朋友是否愿意陪自己去书店。", "translation_zh": "“放学后你愿意陪我一起去书店吗？”美美问她的好朋友。"}, {"id": "B041", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Profesor Dr. Halim telah menjalankan kajian selama lima tahun sebelum ( ________ ) menemui penawar penyakit tersebut.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人敬重的学者与专家（哈林教授博士）。", "translation_zh": "哈林教授博士进行了长达五年的研究，最终找到了该疾病的解药。"}, {"id": "B042", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "( ________ ) haruslah menghargai jasa para pejuang kemerdekaan yang sanggup berkorban demi tanah air tercinta.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括所有人），呼吁全体国民铭记独立先贤的付出。", "translation_zh": "我们应当珍惜那些愿意为心爱祖国牺牲的独立斗士们的功绩。"}, {"id": "B043", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Para pelancong asing itu sangat kagum melihat keindahan Pulau Tioman dan ( ________ ) berjanji akan datang lagi.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代前文的复数群体“外国游客们”（Para pelancong asing）。", "translation_zh": "那些外国游客对刁曼岛的美景赞叹不已，并承诺一定会再来。"}, {"id": "B044", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Siapakah yang telah membantu ( ________ ) menyiapkan lukisan yang cantik ini, Chong Wei?\" tanya ibunya.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），妈妈直接询问宗伟一个人是谁帮他完成画作的。", "translation_zh": "“宗伟，是谁帮你完成这幅漂亮的画作的？”他的妈妈问道。"}, {"id": "B045", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Esok ( ________ ) dan abang akan pergi memancing ikan di sungai,\" kata Azlan kepada sahabat rapatnya, Faizal.", "answer": "aku", "distractors": ["kamu", "dia", "beliau"], "explanation_zh": "第一人称单数代词（我），阿兹兰对挚友法依扎说话时用亲近随意的“aku”。", "translation_zh": "“明天我和哥哥要去河边钓鱼。”阿兹兰对他的挚友法依扎说。"}, {"id": "B046", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Permaisuri Agong kelihatan anggun mengenakan pakaian tradisional dan ( ________ ) tersenyum manis kepada orang ramai.", "answer": "baginda", "distractors": ["beliau", "tuanku", "beta"], "explanation_zh": "第三人称皇室尊称（陛下/王后殿下），用于指代国家元首后（Permaisuri Agong）。", "translation_zh": "国家元首后身穿传统服饰显得端庄优雅，陛下向民众露出了甜美的微笑。"}, {"id": "B047", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Janganlah ( ________ ) membuang sampah merata-rata di kawasan taman sains ini,\" tegur Cikgu Bala kepada sekumpulan murid.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），巴拉老师对着一群学生（sekumpulan murid）劝告不要乱丢垃圾。", "translation_zh": "“你们不要在这个科学园四周乱丢垃圾。”巴拉老师劝告一群学生。"}, {"id": "B048", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Bolehkah ( ________ ) mencuba baju kurung yang berwarna biru itu, puan?\" tanya pelanggan kepada jurujual.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），顾客礼貌地向女店员询问是否可以试穿蓝色的马来套装。", "translation_zh": "“女士，我可以试穿那件蓝色的马来传统套装吗？”顾客问店员。"}, {"id": "B049", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "Pemuda yang menyelamatkan kanak-kanak lemas itu dipuji ramai kerana ( ________ ) sangat berani dan pantas bertindak.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代前文提到的那位救人的年轻男子（Pemuda）。", "translation_zh": "那位救起溺水儿童的青年受到众人称赞，因为他非常勇敢且行动迅速。"}, {"id": "B050", "group": "B", "category": "Group B: Kata Ganti Nama Diri", "sentence": "\"Terima kasih atas bantuan yang telah tuan berikan kepada ( ________ ) sekeluarga,\" ucap Encik Yusof kepada jirannya.", "answer": "kami", "distractors": ["kita", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的邻居），尤索夫先生代表自己一家人向邻居道谢。", "translation_zh": "“谢谢先生给予我们一家人的帮助。”尤索夫先生向他的邻居致谢。"}, {"id": "C001", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Cikgu Wong, ( ________ ) ingin meminjam buku cerita ini untuk dibaca di rumah,\" kata Jia Xuan.", "answer": "saya", "distractors": ["kamu", "dia", "mereka"], "explanation_zh": "第一人称单数代词（我），佳轩礼貌地向黄老师自称并请求借书。", "translation_zh": "“黄老师，我想借这本故事书回家阅读。”佳轩说道。"}, {"id": "C002", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Guru Besar SJK(C) Sin Min menyampaikan ucapan pada perhimpunan pagi dan ( ________ ) menasihati murid supaya rajin belajar.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他/她），用于指代受人尊敬的华小学校校长（Guru Besar）。", "translation_zh": "新民华小的校长在周会上致词，并劝勉学生们要勤奋学习。"}, {"id": "C003", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) mesti menyiapkan kerja sekolah sebelum menonton televisyen,\" pesan ibu kepada Boon Keat.", "answer": "Kamu", "distractors": ["Saya", "Dia", "Beliau"], "explanation_zh": "第二人称单数代词（你），妈妈叮嘱文杰一个人必须先完成功课。", "translation_zh": "“你必须在看电视之前完成功课。”妈妈叮嘱文杰。"}, {"id": "C004", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Ah Meng dan Muthu berkawan baik sejak tahun satu dan ( ________ ) selalu berjalan kaki ke sekolah bersama-sama.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“阿明和穆都”（Ah Meng dan Muthu）两个人。", "translation_zh": "阿明和穆都从一年级起就是好朋友，他们经常一起走路去上学。"}, {"id": "C005", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) berdua ditugaskan untuk menyapu lantai kelas pada hari ini,\" kata Shu Ting dan Yee Ling kepada ketua kelas.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的班长），表示“我们两人”今天负责扫地。", "translation_zh": "“我们两人今天被分配负责扫教室的地板。”淑婷和依琳对班长说。"}, {"id": "C006", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Kawan-kawan, marilah ( ________ ) beratur dengan kemas sebelum masuk ke dewan sekolah,\" kata pengawas itu.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），“marilah kita”邀请大家一起排队。", "translation_zh": "“朋友们，让我们在进入学校礼堂前先整齐排队吧。”那位巡察员说道。"}, {"id": "C007", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Adik lelaki saya berumur lima tahun dan ( ________ ) sangat suka melukis gambar haiwan.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代年幼的弟弟（Adik lelaki）。", "translation_zh": "我的弟弟今年五岁，他非常喜欢画动物的图画。"}, {"id": "C008", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Murid-murid, sila buka buku teks Bahasa Melayu ( ________ ) pada muka surat dua puluh,\" arah Cikgu Lim.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），林老师指示全班同学们（Murid-murid）翻开国语课本。", "translation_zh": "“同学们，请翻开你们的国语课本第20页。”林老师指示道。"}, {"id": "C009", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Ayah bekerja sebagai seorang jurutera dan ( ________ ) selalu pulang lewat pada waktu malam.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受尊敬的长辈或专业人士（爸爸）。", "translation_zh": "爸爸是一名工程师，他晚上经常很晚才回家。"}, {"id": "C010", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Ibu, ( ________ ) telah mendapat markah penuh dalam ujian ejaan tadi!\" jerit Mei Ling dengan gembira.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），美玲开心地向妈妈报喜。", "translation_zh": "“妈妈，我刚才的听写测验拿了满分！”美玲开心地喊道。"}, {"id": "C011", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Kucing putih milik keluarga kami sangat manja dan ( ________ ) suka tidur di atas sofa.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），用于指代动物（白色的猫咪）。", "translation_zh": "我们家的白猫非常粘人，它喜欢睡在沙发上。"}, {"id": "C012", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Mengapakah ( ________ ) tidak hadir ke sekolah semalam, Siva?\" tanya Cikgu Tan.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），陈老师询问西瓦一个人昨天为何缺席。", "translation_zh": "“西瓦，你昨天为什么没有来上学？”陈老师问道。"}, {"id": "C013", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "( ________ ) sekeluarga akan pergi melawat ke rumah datuk di Melaka pada hujung minggu ini.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），表示“我们一家人”要去马六甲探望爷爷。", "translation_zh": "我们一家人这个周末将去马六甲探望爷爷。"}, {"id": "C014", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Sebagai murid yang berdisiplin, ( ________ ) patut mematuhi semua peraturan sekolah,\" kata Cikgu Nor kepada murid-murid.", "answer": "kita", "distractors": ["kami", "mereka", "beliau"], "explanation_zh": "第一人称复数代词（我们——包括老师和全体学生），诺老师勉励大家共同遵守校规。", "translation_zh": "“作为有纪律的学生，我们应当遵守所有的校规。”诺老师对学生们说。"}, {"id": "C015", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Abang sedang mengulang kaji pelajaran di biliknya kerana ( ________ ) akan menduduki peperiksaan SPM tidak lama lagi.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代哥哥（Abang）。", "translation_zh": "哥哥正在房间里温习功课，因为他不久后就要参加SPM考试了。"}, {"id": "C016", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Para guru di sekolah ini sangat berdedikasi dan ( ________ ) sentiasa membimbing murid dengan penuh kesabaran.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代复数名词“老师们”（Para guru）。", "translation_zh": "这所学校的老师们非常敬业，他们总是耐心地教导学生。"}, {"id": "C017", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) berharap agar semua murid tahun enam dapat menjaga nama baik sekolah,\" pesan Guru Penolong Kanan.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Mereka"], "explanation_zh": "第一人称单数代词（我），副校长对六年级学生表达自己的期望。", "translation_zh": "“我希望所有六年级学生都能维护学校的良好声誉。”副校长叮嘱道。"}, {"id": "C018", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Bilakah ( ________ ) hendak pergi ke perpustakaan bersama-sama dengan saya?\" tanya Xin Yi kepada rakan karibnya, Pei Shan.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），欣仪亲切地问好朋友佩珊何时一起去图书馆。", "translation_zh": "“你什么时候要和我一起去图书馆？”欣仪问她的挚友佩珊。"}, {"id": "C019", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Nenek pandai membuat kuih tradisional dan ( ________ ) sering mengajar ibu cara membuatnya.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代受尊敬的长辈（奶奶）。", "translation_zh": "奶奶擅长制作传统糕点，她经常教妈妈制作的方法。"}, {"id": "C020", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) mesti berjanji tidak akan mengulangi kesilapan ini lagi,\" kata ayah kepada Amirul.", "answer": "Kamu", "distractors": ["Saya", "Dia", "Beliau"], "explanation_zh": "第二人称单数代词（你），爸爸严厉地要求阿米鲁一个人做出承诺。", "translation_zh": "“你必须保证以后不再重犯这个错误。”爸爸对阿米鲁说。"}, {"id": "C021", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Terima kasih kerana sudi datang ke majlis hari lahir ( ________ ),\" kata Zhi Hao kepada rakan-rakannya.", "answer": "saya", "distractors": ["kamu", "dia", "mereka"], "explanation_zh": "第一人称单数代词（我），志豪感谢朋友们来参加“我的”生日会。", "translation_zh": "“谢谢你们愿意来参加我的生日派对。”志豪对朋友们说。"}, {"id": "C022", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Kakak sangat gembira apabila ( ________ ) terpilih sebagai ketua pasukan bola tampar sekolah.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（她），指代姐姐（Kakak）。", "translation_zh": "当姐姐被选为学校排球队队长时，她感到非常开心。"}, {"id": "C023", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Janganlah ( ________ ) berasa malu untuk bertanya jika tidak faham,\" kata Cikgu Chong kepada murid-murid kelas 4B.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），张老师鼓励4B班的同学们勇敢发问。", "translation_zh": "“如果有不明白的地方，你们不要不好意思发问。”张老师对4B班的学生们说。"}, {"id": "C024", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Ibu bapa saya bekerja keras setiap hari kerana ( ________ ) mahu memberikan pendidikan yang terbaik kepada kami.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“我的父母”（Ibu bapa saya）。", "translation_zh": "我的父母每天辛勤工作，因为他们想给我们提供最好的教育。"}, {"id": "C025", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) akan memastikan kawasan kantin sentiasa bersih,\" ikrar murid-murid sekolah itu.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），学生们向师长宣誓“我们”会保持食堂清洁。", "translation_zh": "“我们一定会确保食堂周围时刻保持清洁。”该校的学生们宣誓道。"}, {"id": "C026", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Pokok mangga di halaman rumah datuk sudah tua, namun ( ________ ) masih berbuah lebat setiap musim.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），用于指代植物（芒果树）。", "translation_zh": "爷爷院子里的那棵芒果树已经老了，但它每个季节仍然结满果实。"}, {"id": "C027", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Apakah hobi ( ________ ) pada waktu lapang, Jun Jie?\" tanya guru Bahasa Melayu.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），国语老师询问俊杰个人的业余爱好。", "translation_zh": "“俊杰，你在空闲时间有什么爱好？”国语老师问道。"}, {"id": "C028", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Puan Ong merupakan guru sains yang berpengalaman dan ( ________ ) sering menjalankan eksperimen yang menarik.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），指代经验丰富、受人尊敬的王老师（Puan Ong）。", "translation_zh": "王女士是一位经验丰富的科学老师，她经常进行有趣的实验。"}, {"id": "C029", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Wahai sahabatku, mari ( ________ ) ulang kaji pelajaran Matematik bersama-sama di pondok bacaan,\" ajak Li Hua.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括丽华与朋友），邀请朋友一起温习数学。", "translation_zh": "“好朋友，我们一起去阅读亭温习数学吧！”丽华邀请道。"}, {"id": "C030", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "( ________ ) berjanji akan menolong ibu mencuci pinggan mangkuk selepas makan malam nanti.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Beliau"], "explanation_zh": "第一人称单数代词（我），表达自己主动帮忙做家务的承诺。", "translation_zh": "我答应晚饭后会帮妈妈洗碗碟。"}, {"id": "C031", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Mengapakah ( ________ ) menangis di tepi koridor itu, adik?\" tanya seorang pengawas perempuan.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），女巡察员关心地问哭泣的小同学。", "translation_zh": "“小弟弟/小妹妹，你为什么在走廊边哭泣？”一位女巡察员问道。"}, {"id": "C032", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Datuk saya pernah menjadi askar dahulu dan ( ________ ) sangat berani mempertahankan negara.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），指代曾保卫国家、受尊敬的长辈（爷爷）。", "translation_zh": "我的爷爷以前当过兵，他曾非常勇敢地保卫国家。"}, {"id": "C033", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Tolong hantarkan buku latihan Sains ini ke bilik guru untuk ( ________ ),\" kata Cikgu Goh kepada ketua kelas.", "answer": "saya", "distractors": ["kamu", "dia", "mereka"], "explanation_zh": "第一人称单数代词（我），吴老师请班长把科学作业簿送到办公室给“我”。", "translation_zh": "“请帮我把这些科学练习簿送到教师办公室。”吴老师对班长说。"}, {"id": "C034", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Kawan-kawan sekelas saya sangat peramah dan ( ________ ) sentiasa membantu murid baharu menyesuaikan diri.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“同班同学们”（Kawan-kawan sekelas）。", "translation_zh": "我的同班同学们非常友善，他们总是帮助新同学适应环境。"}, {"id": "C035", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) berempat akan menyertai pertandingan bercerita peringkat negeri minggu hadapan,\" kata Zi Xuan kepada gurunya.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的老师），紫轩向老师报告她们四人的参赛计划。", "translation_zh": "“我们四人下周将参加州级讲故事比赛。”紫轩对她的老师说。"}, {"id": "C036", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Sila simpan semua buku cerita selepas ( ________ ) selesai membacanya,\" pesan pustakawan kepada murid-murid.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），图书管理员叮嘱多名学生（murid-murid）阅毕收好书籍。", "translation_zh": "“请你们在看完故事书后把书收好。”图书管理员叮嘱学生们。"}, {"id": "C037", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Hui Min rajin berlatih bermain piano setiap petang kerana ( ________ ) bercita-cita menjadi ahli muzik.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（她），指代同龄学生慧敏（Hui Min）。", "translation_zh": "慧敏每天下午都勤奋练习弹钢琴，因为她的志向是成为一名音乐家。"}, {"id": "C038", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Ayuh, ( ________ ) bersatu padu menjayakan sambutan Hari Guru pada tahun ini!\" seru pengerusi kelab.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括社团主席与所有成员），呼吁大家同心协力办好教师节。", "translation_zh": "“来吧，让我们团结一致，把今年的教师节庆典办好！”学会主席号召道。"}, {"id": "C039", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) mesti berhati-hati semasa melintas jalan raya di hadapan sekolah,\" nasihat pengawal keselamatan kepada budak itu.", "answer": "Kamu", "distractors": ["Saya", "Dia", "Beliau"], "explanation_zh": "第二人称单数代词（你），保安叔叔叮嘱那位小同学过马路要小心。", "translation_zh": "“你在过校门前的马路时一定要小心。”保安人员劝告那个小孩。"}, {"id": "C040", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Bapa saudara saya seorang doktor pakar dan ( ________ ) bertugas di Hospital Kuala Lumpur.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代长辈及专业人士（叔叔/伯父，专科医生）。", "translation_zh": "我的叔叔是一名专科医生，他在吉隆坡医院任职。"}, {"id": "C041", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Ibu, ( ________ ) sudah mengemas katil dan menyapu bilik tidur,\" kata Xiao Mei dengan bangga.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），小美自豪地告诉妈妈自己已经整理好房间。", "translation_zh": "“妈妈，我已经整理好床铺并扫好卧室了。”小美自豪地说。"}, {"id": "C042", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Di manakah ( ________ ) membeli kamus bahasa Melayu yang baharu ini?\" tanya Yi Lin kepada rakan sekelasnya.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），艺琳礼貌地问同班同学在哪里买的新马来文词典。", "translation_zh": "“你是在哪里买这本新的马来文词典的？”艺琳问她的同班同学。"}, {"id": "C043", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Murid-murid tahun empat sedang membuat projek sains di makmal dan ( ________ ) bekerjasama dengan baik.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“四年级的学生们”（Murid-murid tahun empat）。", "translation_zh": "四年级的学生们正在科学室做科学专题作业，他们合作得很好。"}, {"id": "C044", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"( ________ ) ingin mengucapkan selamat hari lahir kepada cikgu,\" kata Wen Qi sambil menghulurkan sekeping kad.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Mereka"], "explanation_zh": "第一人称单数代词（我），文琪递上生日卡向老师祝贺。", "translation_zh": "“我想祝老师生日快乐。”文琪一边递出卡片一边说道。"}, {"id": "C045", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Anjing peliharaan Encik Chong sangat setia dan ( ________ ) sentiasa menjaga keselamatan rumah tuannya.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代动物（张先生饲养的狗）。", "translation_zh": "张先生养的狗非常忠心，它总是守护着主人的家宅安全。"}, {"id": "C046", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Marilah ( ________ ) berdoa agar nenek cepat sembuh,\" kata kakak kepada adik-adiknya.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括姐姐和弟妹们），一起为奶奶祈祷早日康复。", "translation_zh": "“让我们一起祈祷奶奶早日康复吧。”姐姐对弟妹们说。"}, {"id": "C047", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Cikgu, ( ________ ) semua sudah bersedia untuk memulakan persembahan tarian,\" kata ketua pasukan.", "answer": "kami", "distractors": ["kita", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的老师），队长向老师汇报全体队员已准备好。", "translation_zh": "“老师，我们大家都已经准备好开始舞蹈表演了。”队长说道。"}, {"id": "C048", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Pak Cik Ismail menjual nasi lemak di kantin sekolah dan ( ________ ) sangat ramah dengan semua murid.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），指代学校食堂受学生敬重的长辈（伊斯迈叔叔）。", "translation_zh": "伊斯迈叔叔在学校食堂卖椰浆饭，他对所有学生都非常亲切。"}, {"id": "C049", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "\"Harap ( ________ ) semua dapat bersabar sementara menunggu bas sekolah tiba,\" kata cikgu bertugas.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），值日老师安抚正在等候校车的多位学生。", "translation_zh": "“希望你们大家在等待校车到达时能保持耐心。”值日老师说道。"}, {"id": "C050", "group": "C", "category": "Group C: Sekolah & Keluarga (校园与家庭)", "sentence": "Wei Kang mendapat tempat pertama dalam pertandingan melukis kerana ( ________ ) sangat berbakat.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代小选手伟康（Wei Kang）。", "translation_zh": "伟康在绘画比赛中获得了第一名，因为他非常有天赋。"}, {"id": "D001", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Sebagai rakyat Malaysia, ( ________ ) haruslah menjaga kebersihan alam sekitar,\" seru pengacara kempen hijau.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括所有马来西亚公民），呼吁大家共同爱护环境。", "translation_zh": "“作为马来西亚公民，我们应当保护环境清洁。”绿色环保运动主持人号召道。"}, {"id": "D002", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Anggota bomba itu dipuji oleh masyarakat kerana ( ________ ) berani menyelamatkan mangsa kebakaran.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受社会敬重、英勇救人的消防员。", "translation_zh": "那位消防员受到社会大众的赞扬，因为他勇敢地救出了火灾受困者。"}, {"id": "D003", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Sila buang sampah ke dalam tong kitar semula yang telah disediakan untuk keselesaan ( ________ ),\" tulis papan tanda itu.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您），常见于公共告示牌，提醒大众为了“您的”舒适而把垃圾丢进回收桶。", "translation_zh": "“为了您的舒适，请将垃圾丢入已准备好的再循环垃圾桶内。”告示牌上写着。"}, {"id": "D004", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Penduduk Taman Sentosa bekerjasama membersihkan balai raya supaya ( ________ ) dapat menggunakannya dengan selesa.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代圣淘沙花园的居民们（Penduduk Taman Sentosa）。", "translation_zh": "圣淘沙花园的居民合力打扫民众会堂，以便他们能舒适地使用。"}, {"id": "D005", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) akan mendermakan pakaian lama ini kepada mangsa banjir,\" kata Encik Tan dan keluarganya.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），陈先生一家人表示要把旧衣物捐给水灾灾民。", "translation_zh": "“我们将把这些旧衣服捐赠给水灾灾民。”陈先生和家人说道。"}, {"id": "D006", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Pemuda yang jujur itu memulangkan dompet yang dijumpainya kepada pemilik asal kerana ( ________ ) tidak mahu mengambil hak orang lain.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代捡到钱包并归还的诚实青年（Pemuda）。", "translation_zh": "那位诚实的青年把捡到的钱包归还给原主，因为他不想拿别人的东西。"}, {"id": "D007", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Terima kasih, adik. ( ________ ) memang seorang budak yang baik hati,\" puji nenek tua itu sambil tersenyum.", "answer": "Kamu", "distractors": ["Saya", "Dia", "Beliau"], "explanation_zh": "第二人称单数代词（你），老奶奶微笑着称赞帮她的小朋友。", "translation_zh": "“谢谢你，小朋友。你真是个善良的好孩子。”那位老奶奶微笑着称赞道。"}, {"id": "D008", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) berharap agar jiran-jiran di taman ini sentiasa hidup bermuafakat,\" kata ketua rukun tetangga.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Mereka"], "explanation_zh": "第一人称单数代词（我），睦邻计划主席表达自己的期望。", "translation_zh": "“我希望这个花园住宅区的邻居们能够永远和睦相处。”睦邻计划主席说道。"}, {"id": "D009", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Doktor Kavitha merawat pesakit di klinik desa dengan penuh kasih sayang dan ( ________ ) tidak pernah merungut penat.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代受敬重的卡维塔医生（Doktor Kavitha）。", "translation_zh": "卡维塔医生充满爱心地在乡区诊所治疗病人，她从不抱怨疲累。"}, {"id": "D010", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Wahai penduduk kampung, marilah ( ________ ) menanam pokok di sepanjang jalan ini,\" ajak Tok Penghulu.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括村长与全体村民），号召大家一起种树绿化环境。", "translation_zh": "“各位村民，让我们一起沿着这条路种树吧！”村长邀请道。"}, {"id": "D011", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Sungai di belakang kampung itu sangat penting kerana ( ________ ) membekalkan air bersih kepada penduduk.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代自然事物（甘榜后面的那条河 Sungai）。", "translation_zh": "甘榜后面的那条河流非常重要，因为它为居民提供干净的水源。"}, {"id": "D012", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Jika ( ________ ) ternampak kebakaran, sila hubungi pihak bomba dengan segera,\" pesan pegawai bomba kepada orang ramai.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您/各位），消防官员向公众宣导防火安全。", "translation_zh": "“如果您发现火灾，请立即致电消防局。”消防官员提醒公众。"}, {"id": "D013", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Pekerja pembersihan itu bangun awal setiap pagi dan ( ________ ) membersihkan jalan raya demi keselesaan bersama.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），句中表示清洁工人们每天早起清扫马路（也可指群体的工作）。", "translation_zh": "那些清洁工人每天清晨早起，为了大家的舒适而清扫马路。"}, {"id": "D014", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Janganlah ( ________ ) membazirkan air dan elektrik di rumah,\" pesan ibu kepada anak-anaknya.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），妈妈叮嘱多个孩子（anak-anaknya）不要浪费水电。", "translation_zh": "“你们在家里不要浪费水和电。”妈妈叮嘱孩子们。"}, {"id": "D015", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Puan Zaleha aktif dalam kerja-kerja sukarelawan dan ( ________ ) sering membantu golongan warga emas.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代热心公益、受人敬重的扎丽哈女士。", "translation_zh": "扎丽哈女士积极参与志愿工作，她经常帮助乐龄人士。"}, {"id": "D016", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Maafkan ( ________ ), pak cik. Saya tidak nampak pak cik di belakang tadi,\" kata pemandu basikal itu.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），骑脚踏车的人礼貌地向大叔道歉。", "translation_zh": "“对不起，大叔。我刚才没有看到您在后面。”那位骑脚踏车的人说道。"}, {"id": "D017", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Budak lelaki yang membantu orang buta melintas jalan itu sangat mulia hatinya dan ( ________ ) wajar dicontohi.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代助人为乐的小男孩（Budak lelaki）。", "translation_zh": "那个扶盲人过马路的小男孩心地非常善良，他值得大家学习。"}, {"id": "D018", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "( ________ ) mestilah menghormati adat resam dan budaya pelbagai kaum di negara ini agar keamanan berkekalan.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括所有国民），呼吁大家互相尊重各族文化以维持和平。", "translation_zh": "我们必须尊重国内各族的风俗习惯与文化，以使和平得以延续。"}, {"id": "D019", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) sekeluarga baru sahaja berpindah ke taman perumahan ini semalam,\" kata Encik Lim kepada jiran baharunya.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的新邻居），林先生向新邻居自我介绍。", "translation_zh": "“我们一家人昨天才刚搬来这个住宅区。”林先生对他的新邻居说。"}, {"id": "D020", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Mengapakah ( ________ ) memetik bunga di taman awam ini, adik?\" tegur seorang pegawai majlis perbandaran.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），市议会官员制止并询问那位小朋友为何摘花。", "translation_zh": "“小朋友，你为什么在公共公园里摘花？”一位市议会官员劝阻道。"}, {"id": "D021", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Pegawai polis itu menjalankan tugasnya dengan amanah dan ( ________ ) sangat dihormati oleh penduduk setempat.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），指代尽忠职守、深受居民尊敬的警官（Pegawai polis）。", "translation_zh": "那位警官尽忠职守地执行任务，深受当地居民的尊敬。"}, {"id": "D022", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Sukarelawan dari pelbagai kaum berganding bahu membersihkan pantai kerana ( ________ ) mencintai keindahan alam.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代来自各族的“志愿者们”（Sukarelawan）。", "translation_zh": "来自不同族群的志愿者们携手清理海滩，因为他们热爱大自然的美景。"}, {"id": "D023", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Gunakanlah jejantas apabila ( ________ ) hendak melintas jalan raya yang sibuk ini,\" nasihat polis trafik kepada pengguna jalan raya.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您），交警向广大的道路使用者提出安全劝告。", "translation_zh": "“当您要横过这条繁忙的马路时，请使用行人天桥。”交警劝告道路使用者。"}, {"id": "D024", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) ingin mengucapkan ribuan terima kasih kepada semua penderma darah hari ini,\" kata pengarah hospital.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Mereka"], "explanation_zh": "第一人称单数代词（我），医院院长向今日的献血者致谢。", "translation_zh": "“我想向今天所有的献血者致以万分的谢意。”医院院长说道。"}, {"id": "D025", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Hutan hujan tropika sangat berharga kerana ( ________ ) menjadi habitat bagi pelbagai spesies flora dan fauna.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代无生命/自然生态（热带雨林 Hutan hujan tropika）。", "translation_zh": "热带雨林非常珍贵，因为它是各种动植物物种的栖息地。"}, {"id": "D026", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Ayuh, ( ________ ) gunakan beg kitar semula semasa membeli-belah untuk mengurangkan penggunaan beg plastik!\" kata Cikgu Yap.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括叶老师与大家），倡导一起使用环保袋。", "translation_zh": "“来吧，让我们在购物时使用环保袋，以减少塑料袋的使用！”叶老师说道。"}, {"id": "D027", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Ramesh membantu seorang warga emas membawa barang yang berat dan ( ________ ) berasa gembira dapat berbuat baik.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代乐于助人的学生拉美士（Ramesh）。", "translation_zh": "拉美士帮一位老人提重物，他因能行善而感到开心。"}, {"id": "D028", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Pastikan ( ________ ) mengunci pintu rumah sebelum keluar bercuti,\" pesan Puan Mei kepada anak-anaknya.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），梅女士叮嘱孩子们出门度假前锁好门。", "translation_zh": "“确保你们在出门度假前把家门锁好。”梅女士叮嘱孩子们。"}, {"id": "D029", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) telah mengumpulkan sebanyak lima puluh kilogram tin aluminium untuk dikitar semula,\" kata ahli-ahli kelab alam sekitar.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），环保学会会员汇报“我们”已收集了50公斤铝罐。", "translation_zh": "“我们已经收集了五十公斤的铝罐以供再循环。”环保学会会员们说道。"}, {"id": "D030", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Datuk Dr. Sheikh Muszaphar merupakan angkasawan pertama negara dan ( ________ ) menjadi inspirasi kepada generasi muda.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），指代国家首位宇航员拿督锡慕斯查法医生。", "translation_zh": "拿督锡慕斯查法医生是国家首位宇航员，他成为了年轻一代的榜样。"}, {"id": "D031", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Bilakah ( ________ ) hendak menghantar borang penyertaan larian amal itu, Hui Ling?\" tanya Jia Hao.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），家豪礼貌地询问同辈朋友慧敏何时提交义跑报名表格。", "translation_zh": "“慧敏，你什么时候要交那份慈善义跑的报名表格？”家豪问道。"}, {"id": "D032", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Para petani di kawasan itu sangat rajin dan ( ________ ) menanam pelbagai jenis sayur-sayuran segar.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“农夫们”（Para petani）。", "translation_zh": "那个地区的农夫们非常勤劳，他们种植了各种各样的新鲜蔬菜。"}, {"id": "D033", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Jika tidak keberatan, bolehkah ( ________ ) membantu nenek mengangkat bakul buah ini?\" tanya budak yang sopan itu.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），有礼貌的小孩主动询问奶奶是否可以由“我”帮忙提水果篮。", "translation_zh": "“如果不介意的话，我可以帮奶奶提这个水果篮吗？”那位有礼貌的孩子问道。"}, {"id": "D034", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) tidak boleh mementingkan diri sendiri dalam kehidupan bermasyarakat,\" kata Encik Ahmad dalam ceramahnya.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括讲者与所有听众），强调在社区生活中大家不能自私。", "translation_zh": "“我们在社区生活中不能只顾自己。”阿末先生在他的讲座中说道。"}, {"id": "D035", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Pemandu teksi itu memulangkan beg tangan penumpang yang tertinggal kerana ( ________ ) bersikap amanah.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代诚实归还手提包的出租车司机（Pemandu teksi）。", "translation_zh": "那位出租车司机归还了乘客遗留的手提包，因为他为人诚实可靠。"}, {"id": "D036", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Mengapakah ( ________ ) membuang botol plastik itu ke dalam longkang, Ah Chong?\" tegur rakannya.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），朋友直接质问并劝阻阿聪（一个人）把塑料瓶丢进水沟。", "translation_zh": "“阿聪，你为什么把那个塑料瓶丢进水沟里？”他的朋友劝阻道。"}, {"id": "D037", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Menteri Alam Sekitar telah melancarkan kempen bebas plastik dan ( ________ ) menyeru rakyat agar menyokong usaha tersebut.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他/她），指代环境部长（Menteri Alam Sekitar）。", "translation_zh": "环境部长推介了无塑料运动，并呼吁人民支持这项努力。"}, {"id": "D038", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Sila pastikan ( ________ ) menutup paip air dengan rapat selepas mencuci tangan,\" tulis poster di tandas awam.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您），常见于公共场所的宣传海报或标语。", "translation_zh": "“请确保您在洗手后把水龙头关紧。”公共厕所的海报上写着。"}, {"id": "D039", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) berasa sangat gembira dapat menyumbangkan tenaga dalam program gotong-royong ini,\" kata pasukan pengakap.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），童子军队表达“我们”能参与大扫除感到非常开心。", "translation_zh": "“我们很高兴能够在这项大扫除活动中贡献一份力量。”童子军队伍说道。"}, {"id": "D040", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Jiran-jiran di Lorong Mawar saling menghormati dan ( ________ ) sering bertukar-tukar juadah semasa musim perayaan.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代玫瑰巷的邻居们（Jiran-jiran）。", "translation_zh": "玫瑰巷的邻居们互相尊重，他们在佳节期间经常互相交换美食。"}, {"id": "D041", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Wahai anak-anak muda, ( ________ ) ialah harapan bangsa dan negara pada masa hadapan,\" kata tokoh masyarakat itu.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），社会贤达对着一群“年轻人”（anak-anak muda）发表勉励。", "translation_zh": "“年轻人们，你们是国家和民族未来的希望。”那位社会贤达说道。"}, {"id": "D042", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Tong sampah pintar yang dicipta oleh pelajar universiti itu sangat berguna kerana ( ________ ) dapat mengasingkan sisa secara automatik.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代发明物品（智能垃圾桶 Tong sampah pintar）。", "translation_zh": "那些大学生发明的智能垃圾桶非常有用，因为它能够自动分类垃圾。"}, {"id": "D043", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) berjanji akan menjaga haiwan peliharaan ini dengan penuh tanggungjawab,\" kata Yu Heng kepada ayahnya.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Beliau"], "explanation_zh": "第一人称单数代词（我），宇恒向爸爸保证自己会负责任地照顾宠物。", "translation_zh": "“我保证会负起责任好好照顾这只宠物。”宇恒对爸爸说。"}, {"id": "D044", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Cikgu Rosnah menubuhkan kelab kebajikan murid dan ( ________ ) berusaha membantu murid daripada keluarga kurang berkemampuan.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（她），用于指代充满爱心、受人敬重的罗斯娜老师。", "translation_zh": "罗斯娜老师成立了学生福利学会，她努力帮助来自清寒家庭的学生。"}, {"id": "D045", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Marilah ( ________ ) bergotong-royong membersihkan kawasan taman permainan ini supaya selamat untuk kanak-kanak,\" kata Encik Bala.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括巴拉先生和大家），号召大家共同清理游乐场。", "translation_zh": "“让我们一起合力清理这个游乐场，让孩子们能安全玩耍。”巴拉先生说道。"}, {"id": "D046", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Walaupun Ali berasal daripada keluarga yang miskin, ( ________ ) tidak pernah berasa malu dan sentiasa berusaha gigih.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），指代勤奋向上的少年阿里（Ali）。", "translation_zh": "虽然阿里来自贫困的家庭，但他从不感到自卑，并且总是加倍努力。"}, {"id": "D047", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Mengapakah ( ________ ) tidak mematikan suis kipas sebelum keluar dari bilik ini?\" tegur kakak kepada adiknya.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），姐姐提醒弟弟（一个人）离开房间前要关掉风扇开关。", "translation_zh": "“你为什么在离开这间房间前没有关掉风扇开关？”姐姐提醒弟弟。"}, {"id": "D048", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"Jika ( ________ ) memerlukan bantuan semasa berada di pusat beli-belah ini, sila ke kaunter pertanyaan,\" kata juruhebah.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您），商场广播员面向所有顾客发言时使用“anda”。", "translation_zh": "“如果您在这家购物中心需要任何协助，请前往询问处。”广播员说道。"}, {"id": "D049", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "\"( ________ ) berharap agar sumbangan kecil ini dapat meringankan beban keluarga Puan Wong,\" kata wakil persatuan penduduk.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的黄女士一家），居民协会代表表示“我们”的一点心意。", "translation_zh": "“我们希望这点微薄的捐助能够减轻黄女士一家的负担。”居民协会代表说道。"}, {"id": "D050", "group": "D", "category": "Group D: Masyarakat & Nilai (社区与道德)", "sentence": "Para doktor dan jururawat bertugas tanpa mengira masa kerana ( ________ ) mengutamakan nyawa pesakit.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“医生和护士们”（Para doktor dan jururawat）。", "translation_zh": "医生和护士们不分昼夜地值班，因为他们把病人的生命放在第一位。"}, {"id": "E001", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) amat berbesar hati melihat rakyat jelata hidup dalam suasana muhibah,\" titah Sultan Abdullah.", "answer": "Beta", "distractors": ["Patik", "Baginda", "Tuanku"], "explanation_zh": "第一人称皇室自称（朕），苏丹阿都拉对臣民说话时在句首自称“Beta”。", "translation_zh": "“朕看到子民们生活在和谐融洽的氛围中，感到十分欣慰。”苏丹阿都拉谕示道。"}, {"id": "E002", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Ampun tuanku, ( ________ ) memohon izin untuk berangkat pulang ke kampung halaman,\" sembah Laksamana Bentan.", "answer": "patik", "distractors": ["beta", "tuanku", "saya"], "explanation_zh": "第一人称谦称代词（微臣），大臣向苏丹请求准许回乡时必须自称“patik”。", "translation_zh": "“启禀陛下，微臣恳请准许启程返回故乡。”明丹海军统帅叩禀道。"}, {"id": "E003", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Sultan Perak telah berangkat ke majlis jamuan diraja dan ( ________ ) disambut meriah oleh para tetamu kehormat.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室尊称（陛下），在第三人称叙述中指代霹雳苏丹。", "translation_zh": "霹雳苏丹已抵达御宴会场，陛下受到了各位贵宾的热烈欢迎。"}, {"id": "E004", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Semoga ( ________ ) sentiasa berada dalam lindungan Tuhan,\" ucap Datuk Temenggung di hadapan Raja Melaka.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），天猛公在马六甲国王面前当面祝福国王时称呼“tuanku”。", "translation_zh": "“愿陛下永远得到上天的庇佑。”拿督天猛公在马六甲国王面前祝祷道。"}, {"id": "E005", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Jikalau tuan hamba sudi, marilah singgah di teratak buruk ( ________ ) ini,\" pelawa Pak Ali dalam cerita klasik itu.", "answer": "hamba", "distractors": ["beta", "tuanku", "beliau"], "explanation_zh": "第一人称古典谦称（在下），古典故事中平民老伯邀请客人到“在下的”简陋茅屋做客。", "translation_zh": "“若阁下不嫌弃，请到在下的简陋茅舍坐坐吧。”古典故事中的阿里伯父邀请道。"}, {"id": "E006", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Tunku Abdul Rahman dikenang sebagai Bapa Kemerdekaan kerana ( ________ ) telah memperjuangkan kemerdekaan Tanah Melayu.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受全马人民敬仰的国父东姑阿都拉曼（非苏丹王室成员）。", "translation_zh": "东姑阿都拉曼被铭记为“独立之父”，因为他为马来亚争取了独立。"}, {"id": "E007", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) berharap agar generasi muda menghargai sejarah perjuangan tokoh-tokoh terdahulu,\" kata guru sejarah itu.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Mereka"], "explanation_zh": "第一人称单数代词（我），历史老师表达自己的期望。", "translation_zh": "“我希望年轻一代能够珍惜先贤们奋斗的历史。”那位历史老师说道。"}, {"id": "E008", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Wahai sekalian hulubalang, bersiap sedialah ( ________ ) untuk mempertahankan kota ini daripada serangan musuh!\" seru panglima.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），将领对众勇士（sekalian hulubalang）下达备战指令。", "translation_zh": "“各位勇士们，你们做好准备，誓死保卫这座城池抵御敌军来袭！”将领号令道。"}, {"id": "E009", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Mengapakah ( ________ ) bermuram durja hari ini, wahai sahabatku?\" tanya Hang Jebat kepada Hang Tuah.", "answer": "engkau", "distractors": ["aku", "dia", "beliau"], "explanation_zh": "第二人称单数代词（你），古典/挚友语境中汉惹拔关切地询问挚友汉都亚。", "translation_zh": "“我的好朋友，你今天为何愁眉苦脸？”汉惹拔问汉都亚。"}, {"id": "E010", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Janganlah engkau risau, ( ________ ) akan sentiasa berada di sisimu ketika susah dan senang,\" balas Hang Tuah.", "answer": "aku", "distractors": ["kamu", "dia", "beliau"], "explanation_zh": "第一人称单数代词（我），与句中的“engkau”及“sisimu”相呼应。", "translation_zh": "“你别担心，无论顺境逆境，我都会永远站在你身边。”汉都亚回应道。"}, {"id": "E011", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Raja Perlis berkenan menyempurnakan upacara perasmian itu sebelum ( ________ ) berangkat pulang ke istana.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室尊称（陛下），指代玻璃市拉惹（Raja Perlis）。", "translation_zh": "玻璃市拉惹御准主持开幕仪式后，陛下便起驾回宫。"}, {"id": "E012", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Titah perintah ( ________ ) akan patik junjung setinggi-tingginya,\" ujar Bendahara Tun Mutahir.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），句中有“patik”自称，对皇室尊称必用“tuanku”。", "translation_zh": "“陛下的谕旨，微臣必当全力遵行。”宰相敦慕达希尔说道。"}, {"id": "E013", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) ingin menitahkan agar semua pembesar negeri berkumpul di balairung seri esok pagi,\" titah Sultan Muzaffar.", "answer": "Beta", "distractors": ["Patik", "Baginda", "Tuanku"], "explanation_zh": "第一人称皇室自称（朕），苏丹穆扎法尔下达谕令时自称“Beta”。", "translation_zh": "“朕要下旨，命所有州大臣明早齐集于大殿。”苏丹穆扎法尔谕示道。"}, {"id": "E014", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Para pahlawan Melaka berjuang dengan gagah berani sehingga ( ________ ) berjaya mengusir lanun dari perairan selat.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代英勇作战的“马六甲勇士们”（Para pahlawan Melaka）。", "translation_zh": "马六甲的勇士们英勇奋战，最终他们成功将海盗驱逐出海峡海域。"}, {"id": "E015", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) berdua akan memulakan pendakian Gunung Kinabalu pada awal pagi esok,\" kata Faris dan Daniel kepada jurupandu.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者或特指两人），法里斯和丹尼尔汇报登山计划。", "translation_zh": "“我们两人将于明早清晨开始攀登京那巴鲁山。”法里斯和丹尼尔对向导说。"}, {"id": "E016", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Marilah ( ________ ) menghayati erti kemerdekaan dengan penuh rasa syukur,\" kata guru besar pada bulan Ogos.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括校长与全校师生），在国庆月共同体会独立的意义。", "translation_zh": "“让我们怀着感恩的心，一起体会国家独立的意义。”校长在八月国庆月说道。"}, {"id": "E017", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Keris Taming Sari ialah senjata yang terkenal dalam sejarah Melayu dan ( ________ ) dikatakan mempunyai kesaktian.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代历史文物/武器（Keris Taming Sari 短剑）。", "translation_zh": "达明沙里马来短剑是马来历史上有名的武器，据说它具有神奇的力量。"}, {"id": "E018", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) memohon maaf sekiranya terdapat kekhilafan dalam sembah maklum tadi,\" ucap pembesar istana kepada Sultan.", "answer": "Patik", "distractors": ["Beta", "Tuanku", "Baginda"], "explanation_zh": "第一人称谦称代词（微臣），宫廷大臣在苏丹面前请罪道歉时自称“Patik”。", "translation_zh": "“若刚才微臣的奏报有任何疏漏之处，微臣恳请恕罪。”宫廷大臣对苏丹说道。"}, {"id": "E019", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Tun Tan Cheng Lock merupakan seorang tokoh negarawan dan ( ________ ) banyak menyumbang ke arah perpaduan kaum.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人敬重的马来西亚先贤（敦陈祯禄）。", "translation_zh": "敦陈祯禄是一位杰出的政治家，他为促进各族团结做出了巨大贡献。"}, {"id": "E020", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Sila semak jawapan ( ________ ) dengan teliti sebelum menghantar kertas peperiksaan,\" pesan pengawas peperiksaan.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），监考官提醒考场里的所有考生（复数）仔细检查答案。", "translation_zh": "“在交上考卷之前，请你们仔细检查自己的答案。”监考官叮嘱道。"}, {"id": "E021", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Pencuri yang memecah masuk ke dalam kedai emas itu berjaya ditahan setelah ( ________ ) terperangkap di tingkat atas.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他），小偷（Pencuri）属负面人物，不可用尊称“beliau”，必须用“dia”。", "translation_zh": "潜入金店行窃的小偷在被困于楼上后，成功遭到警方逮捕。"}, {"id": "E022", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Bolehkah ( ________ ) mengetahui nama penuh tuan sebelum mendaftarkan maklumat ini?\" tanya pegawai kaunter kepada Encik Wong.", "answer": "saya", "distractors": ["kamu", "dia", "kami"], "explanation_zh": "第一人称单数代词（我），柜台职员礼貌地向黄先生询问能否登记资料。", "translation_zh": "“请问在登记这项资料前，我可以知道先生您的全名吗？”柜台人员问黄先生。"}, {"id": "E023", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) perlu membaca soalan pemahaman dengan teliti supaya tidak melakukan kesilapan,\" nasihat Cikgu Tan kepada Wei Lun.", "answer": "Kamu", "distractors": ["Saya", "Dia", "Beliau"], "explanation_zh": "第二人称单数代词（你），陈老师单独指导伟伦要细心阅读理解题。", "translation_zh": "“你必须细心阅读理解题，以免犯下错误。”陈老师劝勉伟伦。"}, {"id": "E024", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Yang di-Pertuan Agong berkenan mengurniakan darjah kebesaran kepada tokoh jasa dan ( ________ ) turut bersalaman dengan penerima.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室尊称（陛下），用于指代国家最高元首（Yang di-Pertuan Agong）。", "translation_zh": "国家元首御准颁赐勋章给有功人士，陛下也与受封者一一握手。"}, {"id": "E025", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) sekalian rakyat jelata berikrar akan terus setia kepada raja dan negara,\" laung wakil rakyat di hadapan istana.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话的国王），代表全体子民向国王宣誓效忠。", "translation_zh": "“我们全体子民宣誓，将永远效忠君主与国家。”民众代表在皇宫前高呼道。"}, {"id": "E026", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Wahai para peserta, ( ________ ) diminta berkumpul di garisan permulaan sekarang,\" umum pengacara sukan.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您/各位），运动会广播员面向参赛者发出正式广播。", "translation_zh": "“各位参赛者，请您现在到起跑线集合。”运动会司仪广播道。"}, {"id": "E027", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Para saintis itu menjalankan penyelidikan bertahun-tahun sehingga ( ________ ) berjaya mencipta vaksin baharu.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“科学家们”（Para saintis）。", "translation_zh": "那些科学家进行了多年的研究，最终他们成功研发出新的疫苗。"}, {"id": "E028", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Sudahkah ( ________ ) bersiap sedia untuk menghadapi ujian lisan Bahasa Melayu esok?\" tanya Mei Hua kepada rakan karibnya, Siti.", "answer": "awak", "distractors": ["saya", "dia", "mereka"], "explanation_zh": "第二人称单数代词（你），美华亲切地问好朋友茜蒂是否已准备好国语口试。", "translation_zh": "“你已经准备好迎接明天的国语口试了吗？”美华问她的挚友茜蒂。"}, {"id": "E029", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Pendeta Za'ba ialah tokoh bahasa yang terkenal dan ( ________ ) banyak menghasilkan buku tatabahasa Melayu.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代马来西亚国宝级语文大师查巴（Pendeta Za'ba）。", "translation_zh": "语文大师查巴是著名的语言学家，他撰写了许多马来文语法书籍。"}, {"id": "E030", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) mesti sentiasa bersyukur atas nikmat keamanan yang dikecapi selama ini,\" kata Cikgu Lim kepada murid-murid.", "answer": "Kita", "distractors": ["Kami", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——包括林老师与学生），提醒大家共同珍惜长久以来的和平。", "translation_zh": "“我们必须时刻感恩长久以来所享有的和平恩典。”林老师对学生们说。"}, {"id": "E031", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Puteri Gunung Ledang dikatakan amat jelita dan ( ________ ) tinggal di puncak gunung yang tinggi.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室/王族尊称（殿下/公主），传统传说中用于指代金山公主（Puteri Gunung Ledang）。", "translation_zh": "据说金山公主容貌极其美丽，殿下居住在高高的山巅之上。"}, {"id": "E032", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Sekiranya ( ________ ) berkenan, patik akan membina sebuah jambatan yang kukuh di sungai itu,\" sembah jurutera istana.", "answer": "tuanku", "distractors": ["beta", "patik", "baginda"], "explanation_zh": "第二人称皇室尊称（陛下），句中有“patik”自称，对苏丹当面请示时用“tuanku”。", "translation_zh": "“若是陛下御准，微臣将在那条河上建造一座坚固的桥梁。”宫廷工程师叩禀道。"}, {"id": "E033", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Oleh sebab rakyat beta sedang dilanda kesusahan, ( ________ ) mengarahkan agar bantuan makanan diagihkan segera,\" titah Raja.", "answer": "beta", "distractors": ["patik", "tuanku", "baginda"], "explanation_zh": "第一人称皇室自称（朕），与前文的“rakyat beta”完全呼应。", "translation_zh": "“由于朕的子民正遭受困难，朕下令立即分发粮食援助。”国王谕示道。"}, {"id": "E034", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Lagu kebangsaan 'Negaraku' sangat bermakna kerana ( ________ ) melambangkan kedaulatan negara kita.", "answer": "ia", "distractors": ["dia", "beliau", "mereka"], "explanation_zh": "第三人称单数代词（它），指代国歌《Negaraku》（非人类事物）。", "translation_zh": "国歌《我的国家》意义深远，因为它象征着我国的主权。"}, {"id": "E035", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) berazam untuk mendapat keputusan A dalam semua mata pelajaran UASA tahun ini,\" kata Zi Kang dengan yakin.", "answer": "Saya", "distractors": ["Kamu", "Dia", "Beliau"], "explanation_zh": "第一人称单数代词（我），子康充满信心地立下今年UASA评估考全A的志愿。", "translation_zh": "“我立志在今年UASA评估考试的所有科目中都考获A等成绩。”子康自信地说。"}, {"id": "E036", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Pelajar cemerlang itu menerima anugerah daripada pihak sekolah kerana ( ________ ) aktif dalam bidang akademik dan kokurikulum.", "answer": "dia", "distractors": ["beliau", "baginda", "mereka"], "explanation_zh": "第三人称单数代词（他/她），指代在校获得表扬的优秀学生（Pelajar cemerlang）。", "translation_zh": "那位优秀生获得了校方颁发的奖项，因为他在学术和课外活动方面都很活跃。"}, {"id": "E037", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Janganlah ( ________ ) mudah berputus asa walaupun menghadapi rintangan dalam pelajaran,\" pesan ibu kepada adik-beradik itu.", "answer": "kalian", "distractors": ["kami", "mereka", "kita"], "explanation_zh": "第二人称复数代词（你们），妈妈勉励兄弟姐妹们不要轻易放弃学业。", "translation_zh": "“即使在学习上遇到阻碍，你们也不要轻易放弃。”妈妈叮嘱那几个兄弟姐妹。"}, {"id": "E038", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Ampun tuanku, ( ________ ) menjunjung kasih atas kurniaan anugerah ini,\" sembah Datuk Shahbandar.", "answer": "patik", "distractors": ["beta", "tuanku", "saya"], "explanation_zh": "第一人称谦称代词（微臣），港务大臣受封后向苏丹谢恩时自称“patik”。", "translation_zh": "“启禀陛下，微臣感激陛下赐予此项殊荣。”拿督港务大臣叩谢道。"}, {"id": "E039", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Cikgu Azizi merupakan jurulatih pasukan olahraga sekolah dan ( ________ ) telah melatih ramai atlet berjaya.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），指代受人敬重的学校田径队教练阿齐兹老师。", "translation_zh": "阿齐兹老师是学校田径队的教练，他培养了许多成功的运动员。"}, {"id": "E040", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Mari ( ________ ) mulakan mesyuarat kelab komputer kita sekarang,\" kata pengerusi kepada ahli jawatankuasa.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括主席与全体委员），提议大家现在开始开会。", "translation_zh": "“让我们现在开始电脑学会的会议吧。”主席对委员们说。"}, {"id": "E041", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Pelajar-pelajar pertukaran dari Jepun itu sangat kagum dengan budaya Malaysia dan ( ________ ) suka makan nasi lemak.", "answer": "mereka", "distractors": ["kami", "kita", "kalian"], "explanation_zh": "第三人称复数代词（他们），指代“来自日本的交换生们”（Pelajar-pelajar）。", "translation_zh": "那些来自日本的交换生对马来西亚文化赞叹不已，他们很喜欢吃椰浆饭。"}, {"id": "E042", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Bilakah ( ________ ) akan memulangkan buku rujukan sejarah yang dipinjam minggu lepas?\" tanya pustakawan kepada murid itu.", "answer": "kamu", "distractors": ["saya", "dia", "kalian"], "explanation_zh": "第二人称单数代词（你），图书管理员询问那位同学何时归还历史参考书。", "translation_zh": "“你什么时候归还上星期借的历史参考书？”图书管理员问那位学生。"}, {"id": "E043", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"( ________ ) sepasukan telah berlatih selama tiga bulan untuk pertandingan koir ini,\" kata ketua pasukan koir sekolah.", "answer": "Kami", "distractors": ["Kita", "Mereka", "Kalian"], "explanation_zh": "第一人称复数代词（我们——不包括听话者），合唱团团长说明全队已训练了三个月。", "translation_zh": "“我们全队为了这次合唱比赛已经练习了三个月。”学校合唱团团长说道。"}, {"id": "E044", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Tengku Mahkota telah melawat mangsa banjir di pusat pemindahan sementara dan ( ________ ) turut menyampaikan bantuan.", "answer": "baginda", "distractors": ["beliau", "beta", "tuanku"], "explanation_zh": "第三人称皇室尊称（殿下），用于指代王储（Tengku Mahkota）。", "translation_zh": "王储殿下前往临时疏散中心探望水灾灾民，殿下也亲自派发了援助品。"}, {"id": "E045", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Jika ( ________ ) ingin menyertai pertandingan pidato ini, sila daftarkan nama sebelum hari Jumaat,\" maklum poster sekolah.", "answer": "anda", "distractors": ["saya", "beliau", "mereka"], "explanation_zh": "第二人称正式代词（您），学校海报面向所有有兴趣报名的学生发出通知。", "translation_zh": "“如果您想参加这项演讲比赛，请在星期五前报名。”学校海报通知道。"}, {"id": "E046", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Mengapakah ( ________ ) tidak datang ke rumahku semalam, Amir?\" tanya Haris kepada sahabat karibnya.", "answer": "engkau", "distractors": ["aku", "dia", "beliau"], "explanation_zh": "第二人称单数代词（你），句末的“rumahku”（我家）提示两人是亲密好友对话，故用“engkau”。", "translation_zh": "“阿米尔，你昨天为什么没有来我家？”哈里斯问他的挚友。"}, {"id": "E047", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Maafkan aku, Haris. Semalam ( ________ ) terpaksa menemani nenek ke klinik,\" jawab Amir.", "answer": "aku", "distractors": ["kamu", "dia", "beliau"], "explanation_zh": "第一人称单数代词（我），阿米尔回应挚友哈里斯时用对应的“aku”。", "translation_zh": "“对不起，哈里斯。昨天我必须陪奶奶去诊所。”阿米尔回答道。"}, {"id": "E048", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "Tun Razak dikenali sebagai Bapa Pembangunan kerana ( ________ ) banyak memajukan kawasan luar bandar.", "answer": "beliau", "distractors": ["dia", "baginda", "mereka"], "explanation_zh": "第三人称尊称代词（他），用于指代受人敬重的前首相敦拉萨（发展之父）。", "translation_zh": "敦拉萨被称为“发展之父”，因为他大力推动了乡区的发展。"}, {"id": "E049", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Izinkan ( ________ ) membentangkan hasil perbincangan kumpulan kami di hadapan kelas,\" kata wakil kumpulan tiga.", "answer": "saya", "distractors": ["kamu", "dia", "mereka"], "explanation_zh": "第一人称单数代词（我），第三组代表请求由“我”在全班面前呈现小组讨论结果。", "translation_zh": "“请允许我在班上呈报我们小组的讨论结果。”第三组代表说道。"}, {"id": "E050", "group": "E", "category": "Group E: Istana & Lanjutan (皇室与进阶)", "sentence": "\"Sebagai anak yang soleh dan berakhlak mulia, ( ________ ) hendaklah sentiasa mendoakan kesejahteraan ibu bapa,\" pesan ustaz.", "answer": "kita", "distractors": ["kami", "mereka", "kalian"], "explanation_zh": "第一人称复数代词（我们——包括说话者与听话者），教导大家应时刻为父母祈福。", "translation_zh": "“作为孝顺且品德高尚的孩子，我们应当经常为父母的安康祈福。”宗教师叮嘱道。"}]
+    </script>
+
+    <script>
+        const QUESTIONS_PER_SET = 20;
+        const SUPABASE_URL = "https://kuybhocpdsttmmjkihcv.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_kdVxbLe5qMPNkjMhccq52w_ia8RseMQ";
+
+        // Synonym exclusion groups: words in the same group must NEVER appear together in 4 choices
+        const SYNONYM_GROUPS = [
+            ["awak", "anda", "kamu", "engkau"],
+            ["saya", "aku"]
+        ];
+
+        // Default pronoun pool used as fallback if a question has fewer than 3 distractors
+        const DEFAULT_PRONOUN_POOL = [
+            "saya", "kamu", "beliau", "mereka", "kita",
+            "kami", "kalian", "dia", "baginda", "patik",
+            "beta", "tuanku"
+        ];
+
+        let currentStudentId = null;
+        let currentUsername = "";
+        let currentClassName = "";
+        let currentUserName = "";
+        let isNameConfirmed = false;
+        let quizStartTime = Date.now();
+        let wrongWordsThisSet = [];
+        let sessionHistory = [];
+
+        async function sbFetch(path, options = {}) {
+            const headers = {
+                "apikey": SUPABASE_KEY,
+                "Authorization": "Bearer " + SUPABASE_KEY,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            };
+            const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
+            const text = await res.text();
+            let data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+            if (!res.ok) {
+                throw new Error((data && (data.message || data.hint || data.details)) || ("HTTP " + res.status));
+            }
+            return data;
+        }
+
+        function switchAuthTab(tab) {
+            ['login', 'guest'].forEach(t => {
+                document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+                document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+            });
+            document.getElementById('login-error').textContent = "";
+            setTimeout(() => {
+                if (tab === 'login') document.getElementById('login-name-input').focus();
+                else document.getElementById('player-name-input').focus();
+            }, 50);
+        }
+
+        async function loginStudent() {
+            const nameRaw = document.getElementById('login-name-input').value.trim();
+            const pin = document.getElementById('login-pin-input').value.trim();
+            const errEl = document.getElementById('login-error');
+            const btn = document.getElementById('btn-login-submit');
+            errEl.textContent = "";
+
+            if (!nameRaw || !pin) {
+                errEl.textContent = "请输入账号和密码！";
+                return;
+            }
+            const uname = nameRaw.toLowerCase().replace(/\s+/g, '');
+            btn.disabled = true;
+            btn.textContent = "⏳ 正在登录...";
+            try {
+                const rows = await sbFetch(`students?username=eq.${encodeURIComponent(uname)}&select=*`);
+                if (!rows || rows.length === 0) {
+                    errEl.textContent = "❌ 找不到该账号，请联系老师创建账号";
+                    return;
+                }
+                const stu = rows[0];
+                if (stu.is_active === false) {
+                    errEl.textContent = "⏸️ 该账号已被老师停用，请联系老师";
+                    return;
+                }
+                if (stu.pin !== pin) {
+                    errEl.textContent = "❌ 密码错误，请重试";
+                    return;
+                }
+                currentStudentId = stu.id;
+                currentUsername = stu.username;
+                currentUserName = stu.display_name;
+                currentClassName = stu.class_name || "";
+                pendingResumeState = stu.active_quiz_state_kgnd || null;
+                localStorage.setItem('kgnd_auth', JSON.stringify({ id: stu.id, username: stu.username, display_name: stu.display_name, class_name: stu.class_name }));
+                sbFetch(`students?id=eq.${stu.id}`, { method: "PATCH", body: JSON.stringify({ last_login: new Date().toISOString() }) }).catch(() => {});
+                await finishAuthEnterGame();
+            } catch (err) {
+                errEl.textContent = "⚠️ 连接失败：" + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "🔑 登录并开始第一题 ➔";
+            }
+        }
+
+        function confirmPlayerName() {
+            const input = document.getElementById('player-name-input');
+            const val = input.value.trim();
+            currentStudentId = null;
+            currentUsername = "";
+            currentClassName = "";
+            currentUserName = val || "同学 (Murid)";
+            finishAuthEnterGame();
+        }
+
+        async function finishAuthEnterGame() {
+            isNameConfirmed = true;
+            updateUserNameDisplay();
+            document.getElementById('name-modal-overlay').style.display = 'none';
+
+            if (bgmEnabled) {
+                bgmAudio.play().catch(() => {});
+            }
+
+            if (currentStudentId) {
+                await loadPendingAssignments(currentStudentId);
+            } else {
+                pendingAssignments = [];
+                activeAssignment = null;
+                renderAssignedQuizBanner();
+            }
+
+            if (pendingResumeState && Array.isArray(pendingResumeState.pool_ids) && pendingResumeState.pool_ids.length > 0 && pendingResumeState.current_index < pendingResumeState.pool_ids.length) {
+                const st = pendingResumeState;
+                pendingResumeState = null;
+                resumeIncompleteQuiz(st);
+            } else {
+                isForcedResume = false;
+                setQuizLockUI(false);
+                if (allVocabulary.length > 0) {
+                    startNewSet();
+                }
+            }
+        }
+
+        function switchAccount() {
+            if (isForcedResume) {
+                alert("🔒 你有一份尚未完成的测验，请先完成测验后才能切换账号！");
+                return;
+            }
+            closeHistoryModal();
+            localStorage.removeItem('kgnd_auth');
+            currentStudentId = null;
+            currentUsername = "";
+            currentClassName = "";
+            currentUserName = "";
+            isNameConfirmed = false;
+            pendingAssignments = [];
+            activeAssignment = null;
+            pendingResumeState = null;
+            isForcedResume = false;
+            setQuizLockUI(false);
+            renderAssignedQuizBanner();
+            document.getElementById('login-pin-input').value = "";
+            document.getElementById('name-modal-overlay').style.display = 'flex';
+            switchAuthTab('login');
+        }
+
+        function updateUserNameDisplay() {
+            const label = currentClassName ? `${currentUserName} (${currentClassName})` : (currentUserName || "同学 (Murid)");
+            const displayEl = document.getElementById('display-user-name');
+            if (displayEl) displayEl.textContent = label;
+            const celebNameEl = document.getElementById('celebrate-player-name');
+            if (celebNameEl) celebNameEl.textContent = currentUserName || "同学 (Murid)";
+            const finalNameEl = document.getElementById('final-user-name');
+            if (finalNameEl) finalNameEl.textContent = currentUserName || "同学 (Murid)";
+        }
+
+        function editUserName() {
+            if (currentStudentId) {
+                openHistoryModal();
+                return;
+            }
+            const newName = prompt("请输入你的名字 / Sila masukkan nama anda:", currentUserName || "");
+            if (newName !== null && newName.trim()) {
+                currentUserName = newName.trim();
+                updateUserNameDisplay();
+            }
+        }
+
+        let allVocabulary = [];
+        let activePool = [];
+        let savedCurrentSet = [];
+        let pendingAssignments = [];
+        let activeAssignment = null;
+        let currentIndex = 0;
+        let currentQuestion = null;
+        let gameActive = false;
+
+        let scoreBetul = 0;
+        let scoreSalah = 0;
+        let hasMadeMistakeThisRound = false;
+        let currentHistoryRowId = null;
+        let liveSyncPromise = Promise.resolve();
+        let pendingResumeState = null;
+        let isForcedResume = false;
+        let lastConfirmedCategory = "ALL";
+        let pendingQuitAction = null;
+
+        function setQuizLockUI(locked) {
+            const catSel = document.getElementById('category-filter');
+            const quitBtn = document.getElementById('quit-quiz-btn');
+            if (catSel) catSel.disabled = !!locked;
+            if (quitBtn) quitBtn.style.display = locked ? 'none' : 'inline-block';
+        }
+
+        function populateCategoryFilter() {
+            const sel = document.getElementById('category-filter');
+            if (!sel) return;
+            const prev = sel.value || 'ALL';
+            const catCounts = {};
+            allVocabulary.forEach(item => {
+                const c = item.category || 'Group A: Kata Ganti Nama Diri';
+                catCounts[c] = (catCounts[c] || 0) + 1;
+            });
+            const cats = Object.keys(catCounts);
+            let html = `<option value="ALL">🌟 全部题目 (All: ${allVocabulary.length}题)</option>`;
+            cats.forEach(c => {
+                html += `<option value="${c}">📘 ${c} (${catCounts[c]}题)</option>`;
+            });
+            sel.innerHTML = html;
+            if (prev === 'ALL' || cats.includes(prev)) {
+                sel.value = prev;
+            }
+        }
+
+        function resumeIncompleteQuiz(st) {
+            const vocabMap = {};
+            allVocabulary.forEach(w => {
+                if (w.id) vocabMap[w.id] = w;
+            });
+            let pool = st.pool_ids.map(id => vocabMap[id]).filter(Boolean);
+            if (pool.length === 0) {
+                isForcedResume = false;
+                setQuizLockUI(false);
+                startNewSet();
+                return;
+            }
+            activePool = pool;
+            savedCurrentSet = [...activePool];
+            scoreBetul = st.score_correct || 0;
+            scoreSalah = st.score_wrong || 0;
+            currentIndex = Math.max(st.current_index || 0, scoreBetul + scoreSalah);
+            wrongWordsThisSet = Array.isArray(st.wrong_words) ? st.wrong_words : [];
+            currentHistoryRowId = st.history_row_id || null;
+            quizStartTime = Date.now() - ((st.elapsed_sec || 0) * 1000);
+            isForcedResume = true;
+
+            if (st.assignment_id) {
+                activeAssignment = pendingAssignments.find(a => a.id === st.assignment_id) || {
+                    id: st.assignment_id,
+                    quiz_code: st.quiz_code || "测验",
+                    attempt_no: 1,
+                    quizzes_kgnd: { question_count: activePool.length }
+                };
+            } else {
+                activeAssignment = null;
+                const catSel = document.getElementById('category-filter');
+                if (catSel && st.category) {
+                    catSel.value = st.category;
+                    lastConfirmedCategory = st.category;
+                }
+            }
+
+            document.getElementById('score-b').textContent = scoreBetul;
+            document.getElementById('score-s').textContent = scoreSalah;
+            document.getElementById('celebrate-screen').style.display = 'none';
+            setQuizLockUI(true);
+            renderAssignedQuizBanner();
+            loadNextQuestion();
+        }
+
+        function isQuizInProgress() {
+            const celebrateEl = document.getElementById('celebrate-screen');
+            const isCelebrating = celebrateEl && celebrateEl.style.display === 'flex';
+            return activePool.length > 0 && (scoreBetul + scoreSalah) > 0 && currentIndex < activePool.length && !isCelebrating;
+        }
+
+        function onCategoryFilterChange() {
+            const sel = document.getElementById('category-filter');
+            if (isForcedResume) {
+                sel.value = lastConfirmedCategory;
+                alert("🔒 请先完成上次未完成的测验，才能切换单元！");
+                return;
+            }
+            if (isQuizInProgress()) {
+                requestQuitQuiz('switch_cat');
+            } else {
+                lastConfirmedCategory = sel.value;
+                startNewSet();
+            }
+        }
+
+        function requestQuitQuiz(action) {
+            if (isForcedResume) {
+                alert("🔒 请先完成上次未完成的测验！");
+                return;
+            }
+            if (!isQuizInProgress()) {
+                startNewSet();
+                return;
+            }
+            pendingQuitAction = action;
+            const answered = scoreBetul + scoreSalah;
+            const totalQ = activePool.length || QUESTIONS_PER_SET;
+            document.getElementById('quit-warn-progress').textContent = `当前进度：${answered} / ${totalQ}`;
+            document.getElementById('quit-warn-correct').textContent = scoreBetul;
+            document.getElementById('quit-warn-wrong').textContent = scoreSalah;
+            document.getElementById('quit-warn-overlay').style.display = 'flex';
+        }
+
+        function cancelQuitQuiz() {
+            if (pendingQuitAction === 'switch_cat') {
+                document.getElementById('category-filter').value = lastConfirmedCategory;
+            }
+            pendingQuitAction = null;
+            document.getElementById('quit-warn-overlay').style.display = 'none';
+        }
+
+        function confirmQuitQuiz() {
+            const action = pendingQuitAction;
+            pendingQuitAction = null;
+            document.getElementById('quit-warn-overlay').style.display = 'none';
+            if (action === 'switch_cat') {
+                lastConfirmedCategory = document.getElementById('category-filter').value;
+            }
+            startNewSet();
+        }
+
+        window.addEventListener('beforeunload', (e) => {
+            if (isQuizInProgress()) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        let sfxEnabled = true;
+        let bgmEnabled = false;
+        const bgmAudio = document.getElementById('bgm-music');
+        bgmAudio.volume = 0.22;
+
+        function toggleSFX() {
+            sfxEnabled = !sfxEnabled;
+            const btn = document.getElementById('sfx-toggle-btn');
+            btn.textContent = sfxEnabled ? "🔊 音效" : "🔇 静音";
+        }
+
+        function toggleBGM() {
+            bgmEnabled = !bgmEnabled;
+            const btn = document.getElementById('bgm-toggle-btn');
+            if (bgmEnabled) {
+                btn.textContent = "🎵 音乐开";
+                btn.classList.add('active');
+                bgmAudio.play().catch(() => {});
+            } else {
+                btn.textContent = "🎵 音乐";
+                btn.classList.remove('active');
+                bgmAudio.pause();
+            }
+        }
+
+        function playSound(id) {
+            if (!sfxEnabled) return;
+            const el = document.getElementById(id);
+            if (el) {
+                el.currentTime = 0;
+                el.play().catch(() => {});
+            }
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        async function initGameData() {
+            try {
+                const res = await fetch('kata_ganti_nama_data.json', { cache: 'no-store' });
+                if (res.ok) {
+                    allVocabulary = await res.json();
+                } else {
+                    throw new Error("HTTP error");
+                }
+            } catch (err) {
+                allVocabulary = JSON.parse(document.getElementById('embedded-data').textContent);
+            }
+
+            populateCategoryFilter();
+
+            let restored = false;
+            try {
+                const saved = JSON.parse(localStorage.getItem('kgnd_auth') || 'null');
+                if (saved && saved.id) {
+                    const rows = await sbFetch(`students?id=eq.${saved.id}&select=*`);
+                    if (rows && rows[0] && rows[0].is_active !== false) {
+                        currentStudentId = rows[0].id;
+                        currentUsername = rows[0].username;
+                        currentUserName = rows[0].display_name;
+                        currentClassName = rows[0].class_name || "";
+                        pendingResumeState = rows[0].active_quiz_state_kgnd || null;
+                        document.getElementById('name-modal-overlay').style.display = 'none';
+                        await finishAuthEnterGame();
+                        restored = true;
+                    } else {
+                        localStorage.removeItem('kgnd_auth');
+                    }
+                }
+            } catch (e) {}
+            if (!restored) {
+                setTimeout(() => {
+                    const inp = document.getElementById('login-name-input');
+                    if (inp) inp.focus();
+                }, 100);
+            }
+        }
+
+        async function loadPendingAssignments(studentId) {
+            try {
+                const rows = await sbFetch(`quiz_assignments_kgnd?student_id=eq.${studentId}&status=eq.pending&order=assigned_at.asc&select=*,quizzes_kgnd(*)`);
+                pendingAssignments = (rows || []).filter(r => r.quizzes_kgnd);
+            } catch (err) {
+                pendingAssignments = [];
+            }
+            renderAssignedQuizBanner();
+        }
+
+        function renderAssignedQuizBanner() {
+            const banner = document.getElementById('assigned-quiz-banner');
+            const textEl = document.getElementById('assigned-quiz-text');
+            const actEl = document.getElementById('assigned-quiz-actions');
+            if (!banner) return;
+            if (!currentStudentId || pendingAssignments.length === 0) {
+                banner.style.display = 'none';
+                return;
+            }
+            banner.style.display = 'flex';
+            if (activeAssignment) {
+                const q = activeAssignment.quizzes_kgnd || {};
+                const attemptLabel = (activeAssignment.attempt_no || 1) > 1 ? ` (第 ${activeAssignment.attempt_no} 次重做)` : '';
+                textEl.innerHTML = `📝 正在作答老师派发的测验：<span style="color:#d84315;">${activeAssignment.quiz_code}${attemptLabel}</span> ${q.title ? `— ${q.title}` : ''}（共 ${activePool.length} 题）`;
+                actEl.innerHTML = isForcedResume
+                    ? `<span style="font-size:0.85em; color:#c62828; font-weight:bold;">🔒 请完成此测验</span>`
+                    : `<button class="top-btn" onclick="exitAssignedQuiz()" style="background:#fff3e0; border-color:#ff9800; color:#e65100;">↩️ 返回自由练习</button>`;
+            } else {
+                textEl.innerHTML = `📢 老师派发了 <strong>${pendingAssignments.length}</strong> 份待完成测验！请点击开始：`;
+                actEl.innerHTML = pendingAssignments.map(a => {
+                    const q = a.quizzes_kgnd || {};
+                    const att = (a.attempt_no || 1) > 1 ? ` (第${a.attempt_no}次)` : '';
+                    return `<button class="top-btn" onclick="startAssignedQuiz('${a.id}')" style="background:#3949ab; color:#fff; border-color:#283593;">📝 开始 ${a.quiz_code}${att} (${q.question_count || 20}题)</button>`;
+                }).join('');
+            }
+        }
+
+        function startAssignedQuiz(assignmentId) {
+            if (isForcedResume) {
+                alert("🔒 请先完成当前未完成的测验！");
+                return;
+            }
+            const assign = pendingAssignments.find(a => a.id === assignmentId);
+            if (!assign || !assign.quizzes_kgnd) return;
+            activeAssignment = assign;
+            const q = assign.quizzes_kgnd;
+            const idSet = Array.isArray(q.question_ids) ? q.question_ids : [];
+            const vocabMap = {};
+            allVocabulary.forEach(w => {
+                if (w.id) vocabMap[w.id] = w;
+            });
+            let pool = idSet.map(id => vocabMap[id]).filter(Boolean);
+            if (pool.length === 0) {
+                const units = Array.isArray(q.units) ? q.units : [];
+                const unitFiltered = allVocabulary.filter(w => units.includes(w.category));
+                pool = shuffle(unitFiltered).slice(0, q.question_count || 20);
+            } else {
+                pool = shuffle(pool);
+            }
+            activePool = pool;
+            savedCurrentSet = [...activePool];
+            currentIndex = 0;
+            scoreBetul = 0;
+            scoreSalah = 0;
+            quizStartTime = Date.now();
+            wrongWordsThisSet = [];
+            currentHistoryRowId = null;
+            document.getElementById('score-b').textContent = "0";
+            document.getElementById('score-s').textContent = "0";
+            document.getElementById('celebrate-screen').style.display = 'none';
+            renderAssignedQuizBanner();
+            loadNextQuestion();
+        }
+
+        function exitAssignedQuiz() {
+            if (isForcedResume) {
+                alert("🔒 请先完成当前未完成的测验！");
+                return;
+            }
+            activeAssignment = null;
+            renderAssignedQuizBanner();
+            startNewSet();
+        }
+
+        function startNewSet() {
+            activeAssignment = null;
+            renderAssignedQuizBanner();
+            const selectedCat = document.getElementById('category-filter').value;
+            let filtered = selectedCat === "ALL"
+                ? [...allVocabulary]
+                : allVocabulary.filter(item => item.category === selectedCat);
+
+            const shuffled = shuffle(filtered);
+            const setLimit = Math.min(QUESTIONS_PER_SET, shuffled.length);
+            activePool = shuffled.slice(0, setLimit);
+            savedCurrentSet = [...activePool];
+
+            currentIndex = 0;
+            scoreBetul = 0;
+            scoreSalah = 0;
+            quizStartTime = Date.now();
+            wrongWordsThisSet = [];
+            currentHistoryRowId = null;
+            document.getElementById('score-b').textContent = "0";
+            document.getElementById('score-s').textContent = "0";
+            document.getElementById('celebrate-screen').style.display = 'none';
+
+            loadNextQuestion();
+        }
+
+        function repeatCurrentSet() {
+            activePool = shuffle([...savedCurrentSet]);
+            currentIndex = 0;
+            scoreBetul = 0;
+            scoreSalah = 0;
+            quizStartTime = Date.now();
+            wrongWordsThisSet = [];
+            currentHistoryRowId = null;
+            document.getElementById('score-b').textContent = "0";
+            document.getElementById('score-s').textContent = "0";
+            document.getElementById('celebrate-screen').style.display = 'none';
+
+            loadNextQuestion();
+        }
+
+        function getSynonymGroupIndex(word) {
+            const low = (word || '').trim().toLowerCase();
+            for (let i = 0; i < SYNONYM_GROUPS.length; i++) {
+                if (SYNONYM_GROUPS[i].includes(low)) return i;
+            }
+            return -1;
+        }
+
+        function matchCase(word, template) {
+            if (!word) return "";
+            const isCap = template && template[0] === template[0].toUpperCase() && template[0] !== template[0].toLowerCase();
+            if (isCap) {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            }
+            return word.toLowerCase();
+        }
+
+        // Distractor generator strictly enforcing synonym-group exclusion:
+        // Never put (awak, anda, kamu) together or (saya, aku) together!
+        function generateOptions(correctItem) {
+            const ans = (correctItem.answer || "").trim();
+            const ansLower = ans.toLowerCase();
+            const usedWords = new Set([ansLower]);
+            const usedGroups = new Set();
+            const ansGroup = getSynonymGroupIndex(ansLower);
+            if (ansGroup !== -1) usedGroups.add(ansGroup);
+
+            const distractors = [];
+            const preset = Array.isArray(correctItem.distractors) ? correctItem.distractors : [];
+
+            for (const d of preset) {
+                const dClean = (d || "").trim();
+                const dLower = dClean.toLowerCase();
+                if (!dLower || usedWords.has(dLower)) continue;
+                const g = getSynonymGroupIndex(dLower);
+                if (g !== -1 && usedGroups.has(g)) continue;
+                usedWords.add(dLower);
+                if (g !== -1) usedGroups.add(g);
+                distractors.push(matchCase(dClean, ans));
+                if (distractors.length >= 3) break;
+            }
+
+            if (distractors.length < 3) {
+                const candidatePool = shuffle([...DEFAULT_PRONOUN_POOL]);
+                for (const d of candidatePool) {
+                    const dLower = d.toLowerCase();
+                    if (usedWords.has(dLower)) continue;
+                    const g = getSynonymGroupIndex(dLower);
+                    if (g !== -1 && usedGroups.has(g)) continue;
+                    usedWords.add(dLower);
+                    if (g !== -1) usedGroups.add(g);
+                    distractors.push(matchCase(d, ans));
+                    if (distractors.length >= 3) break;
+                }
+            }
+
+            const choices = [
+                { text: ans, isCorrect: true },
+                ...distractors.slice(0, 3).map(t => ({ text: t, isCorrect: false }))
+            ];
+            return shuffle(choices);
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function renderSentenceWithBlank(sentence, filledAnswer) {
+            const safe = escapeHtml(sentence);
+            const blankRegex = /\(\s*_+\s*\)|_{3,}/g;
+            if (filledAnswer) {
+                return safe.replace(blankRegex, `<span class="blank-pill filled">${escapeHtml(filledAnswer)}</span>`);
+            }
+            return safe.replace(blankRegex, `<span class="blank-pill">________</span>`);
+        }
+
+        function loadNextQuestion() {
+            if (currentIndex >= activePool.length) {
+                showCelebration();
+                return;
+            }
+
+            gameActive = true;
+            hasMadeMistakeThisRound = false;
+            currentQuestion = activePool[currentIndex];
+
+            document.getElementById('level-text').textContent = `第 ${currentIndex + 1} 题 / 共 ${activePool.length} 题`;
+            const progressPct = ((currentIndex + 1) / activePool.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+
+            document.getElementById('cat-tag').textContent = currentQuestion.category || "Kata Ganti Nama Diri";
+            document.getElementById('qid-tag').textContent = currentQuestion.id || `#${currentIndex + 1}`;
+            document.getElementById('sentence-prompt').innerHTML = renderSentenceWithBlank(currentQuestion.sentence, null);
+
+            document.getElementById('feedback-banner').textContent = "";
+            document.getElementById('learning-card').style.display = "none";
+            document.getElementById('next-btn').style.display = "none";
+
+            const choices = generateOptions(currentQuestion);
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = "";
+
+            const letters = ["A", "B", "C", "D"];
+            choices.forEach((choice, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerHTML = `
+                    <span class="option-badge">${letters[idx]}</span>
+                    <span class="option-label">${escapeHtml(choice.text)}</span>
+                `;
+                btn.onclick = () => onSelectChoice(choice, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function onSelectChoice(choice, btn) {
+            if (!gameActive) return;
+
+            const banner = document.getElementById('feedback-banner');
+            const allOptionBtns = document.querySelectorAll('.option-btn');
+
+            if (choice.isCorrect) {
+                gameActive = false;
+                playSound('sfx-correct');
+
+                if (!hasMadeMistakeThisRound) {
+                    scoreBetul++;
+                    document.getElementById('score-b').textContent = scoreBetul;
+                    syncLiveProgress();
+                }
+
+                btn.classList.add('correct');
+                allOptionBtns.forEach(b => {
+                    if (b !== btn) b.classList.add('grayed-out');
+                    b.disabled = true;
+                });
+
+                // Fill the blank in the sentence prompt with the green highlighted answer
+                document.getElementById('sentence-prompt').innerHTML = renderSentenceWithBlank(currentQuestion.sentence, currentQuestion.answer);
+
+                banner.innerHTML = "🎉 太棒了！答对了！(Tahniah! Jawapan tepat!)";
+                banner.style.color = "#2e7d32";
+
+                // Populate Learning Card
+                document.getElementById('card-answer').textContent = currentQuestion.answer;
+                document.getElementById('card-complete-bm').innerHTML = renderSentenceWithBlank(currentQuestion.sentence, currentQuestion.answer);
+                document.getElementById('card-translation-zh').textContent = currentQuestion.translation_zh ? `🇨🇳 句意：${currentQuestion.translation_zh}` : "";
+                const explainEl = document.getElementById('card-explain-zh');
+                if (currentQuestion.explanation_zh) {
+                    explainEl.textContent = `💡 语法解析：${currentQuestion.explanation_zh}`;
+                    explainEl.style.display = "block";
+                } else {
+                    explainEl.style.display = "none";
+                }
+                document.getElementById('learning-card').style.display = "block";
+                document.getElementById('next-btn').style.display = "inline-block";
+            } else {
+                playSound('sfx-wrong');
+                btn.classList.add('incorrect');
+                btn.disabled = true;
+
+                if (!hasMadeMistakeThisRound) {
+                    hasMadeMistakeThisRound = true;
+                    scoreSalah++;
+                    document.getElementById('score-s').textContent = scoreSalah;
+                    wrongWordsThisSet.push({
+                        id: currentQuestion.id,
+                        bm: `${currentQuestion.id}: ${currentQuestion.answer}`,
+                        chinese: currentQuestion.sentence
+                    });
+                    syncLiveProgress();
+                }
+
+                banner.innerHTML = `❌ 不对哦，<strong>“${escapeHtml(choice.text)}”</strong> 不适合填入这个句子，请再选一次！`;
+                banner.style.color = "#c62828";
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            loadNextQuestion();
+        }
+
+        function showCelebration() {
+            gameActive = false;
+            updateUserNameDisplay();
+            document.getElementById('celebrate-screen').style.display = 'flex';
+            document.getElementById('final-correct').textContent = scoreBetul;
+            document.getElementById('final-total').textContent = activePool.length;
+            document.getElementById('final-wrong').textContent = scoreSalah;
+            const total = scoreBetul + scoreSalah;
+            const acc = total > 0 ? Math.round((scoreBetul / total) * 100) : 100;
+            document.getElementById('final-accuracy').textContent = acc + "%";
+            playSound('sfx-correct');
+
+            const record = buildCurrentRecord();
+            sessionHistory.unshift(record);
+            saveQuizHistory(record, activeAssignment);
+        }
+
+        function buildCurrentRecord() {
+            const answered = scoreBetul + scoreSalah;
+            const acc = answered > 0 ? Math.round((scoreBetul / answered) * 100) : 100;
+            const durationSec = Math.max(1, Math.round((Date.now() - quizStartTime) / 1000));
+            const cat = activeAssignment
+                ? `📝 ${activeAssignment.quiz_code}`
+                : document.getElementById('category-filter').value;
+            return {
+                student_id: currentStudentId,
+                username: currentUsername || currentUserName,
+                display_name: currentUserName,
+                category: cat,
+                score_correct: scoreBetul,
+                score_wrong: scoreSalah,
+                total_questions: activePool.length,
+                accuracy: acc,
+                duration_seconds: durationSec,
+                wrong_words: wrongWordsThisSet,
+                played_at: new Date().toISOString()
+            };
+        }
+
+        function syncLiveProgress() {
+            if (!currentStudentId || activePool.length === 0) return;
+            const snapshot = buildCurrentRecord();
+            const resumePayload = {
+                history_row_id: currentHistoryRowId,
+                assignment_id: activeAssignment ? activeAssignment.id : null,
+                quiz_code: activeAssignment ? activeAssignment.quiz_code : null,
+                category: snapshot.category,
+                pool_ids: activePool.map(w => w.id),
+                current_index: currentIndex,
+                score_correct: snapshot.score_correct,
+                score_wrong: snapshot.score_wrong,
+                wrong_words: snapshot.wrong_words,
+                elapsed_sec: snapshot.duration_seconds,
+                updated_at: snapshot.played_at
+            };
+            liveSyncPromise = liveSyncPromise.then(async () => {
+                try {
+                    if (!currentHistoryRowId) {
+                        const res = await sbFetch("quiz_history_kgnd", {
+                            method: "POST",
+                            headers: { "Prefer": "return=representation" },
+                            body: JSON.stringify(snapshot)
+                        });
+                        if (Array.isArray(res) && res[0] && res[0].id) {
+                            currentHistoryRowId = res[0].id;
+                            resumePayload.history_row_id = currentHistoryRowId;
+                        }
+                    } else {
+                        await sbFetch(`quiz_history_kgnd?id=eq.${currentHistoryRowId}`, {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                score_correct: snapshot.score_correct,
+                                score_wrong: snapshot.score_wrong,
+                                accuracy: snapshot.accuracy,
+                                duration_seconds: snapshot.duration_seconds,
+                                wrong_words: snapshot.wrong_words,
+                                played_at: snapshot.played_at
+                            })
+                        });
+                    }
+                    sbFetch(`students?id=eq.${currentStudentId}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ active_quiz_state_kgnd: resumePayload })
+                    }).catch(() => {});
+                } catch (e) {
+                    console.warn("Live sync warning:", e.message);
+                }
+            });
+        }
+
+        async function saveQuizHistory(record, finishedAssign) {
+            const statusEl = document.getElementById('cloud-save-status');
+            if (!currentStudentId) {
+                statusEl.textContent = "💡 游客模式：仅保存在本次页面（登录后可永久记录到云端）";
+                statusEl.style.background = "#fff8e1";
+                statusEl.style.color = "#f57c00";
+                statusEl.style.borderColor = "#ffe082";
+                return;
+            }
+            statusEl.textContent = "☁️ 正在上传成绩到云端...";
+            statusEl.style.background = "#e3f2fd";
+            statusEl.style.color = "#1565c0";
+            statusEl.style.borderColor = "#90caf9";
+            try {
+                await liveSyncPromise;
+                isForcedResume = false;
+                pendingResumeState = null;
+                setQuizLockUI(false);
+                sbFetch(`students?id=eq.${currentStudentId}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ active_quiz_state_kgnd: null })
+                }).catch(() => {});
+                let savedViaPatch = false;
+                if (currentHistoryRowId) {
+                    try {
+                        const updated = await sbFetch(`quiz_history_kgnd?id=eq.${currentHistoryRowId}`, {
+                            method: "PATCH",
+                            headers: { "Prefer": "return=representation" },
+                            body: JSON.stringify({
+                                score_correct: record.score_correct,
+                                score_wrong: record.score_wrong,
+                                total_questions: record.total_questions,
+                                accuracy: record.accuracy,
+                                duration_seconds: record.duration_seconds,
+                                wrong_words: record.wrong_words,
+                                played_at: record.played_at
+                            })
+                        });
+                        if (Array.isArray(updated) && updated.length > 0) savedViaPatch = true;
+                    } catch (patchErr) {
+                        savedViaPatch = false;
+                    }
+                }
+                if (!savedViaPatch) {
+                    await sbFetch("quiz_history_kgnd", {
+                        method: "POST",
+                        body: JSON.stringify(record)
+                    });
+                }
+                if (finishedAssign) {
+                    await sbFetch(`quiz_assignments_kgnd?id=eq.${finishedAssign.id}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({
+                            status: "completed",
+                            score_correct: record.score_correct,
+                            score_wrong: record.score_wrong,
+                            accuracy: record.accuracy,
+                            completed_at: new Date().toISOString()
+                        })
+                    });
+                    pendingAssignments = pendingAssignments.filter(a => a.id !== finishedAssign.id);
+                    if (activeAssignment && activeAssignment.id === finishedAssign.id) {
+                        activeAssignment = null;
+                    }
+                    renderAssignedQuizBanner();
+                }
+                statusEl.textContent = finishedAssign
+                    ? `✅ 「${finishedAssign.quiz_code}」已提交并记录至云端！`
+                    : "✅ 成绩与错题已成功保存至云端学习记录！";
+                statusEl.style.background = "#e8f5e9";
+                statusEl.style.color = "#2e7d32";
+                statusEl.style.borderColor = "#a5d6a7";
+            } catch (err) {
+                statusEl.textContent = "⚠️ 云端保存失败：" + err.message;
+                statusEl.style.background = "#ffebee";
+                statusEl.style.color = "#c62828";
+                statusEl.style.borderColor = "#ef9a9a";
+            }
+        }
+
+        function openHistoryModal() {
+            const label = currentClassName ? `${currentUserName} (${currentClassName})` : (currentUserName || "游客");
+            document.getElementById('hist-player-title').textContent = label;
+            document.getElementById('hist-account-mode').textContent = currentStudentId
+                ? `☁️ 已登录账号：${currentUsername}`
+                : "🚀 当前为游客模式（仅显示本次记录）";
+            document.getElementById('history-modal-overlay').style.display = 'flex';
+            loadStudentHistory();
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal-overlay').style.display = 'none';
+        }
+
+        async function loadStudentHistory() {
+            const listEl = document.getElementById('history-list');
+            listEl.innerHTML = `<p style="text-align:center; color:#777;">⏳ 正在读取学习记录...</p>`;
+            let rows = [];
+            if (currentStudentId) {
+                try {
+                    rows = await sbFetch(`quiz_history_kgnd?student_id=eq.${encodeURIComponent(currentStudentId)}&order=played_at.desc&limit=30`);
+                } catch (err) {
+                    listEl.innerHTML = `<p style="text-align:center; color:#c62828;">⚠️ 读取记录失败：${err.message}</p>`;
+                    return;
+                }
+            } else {
+                rows = sessionHistory;
+            }
+
+            document.getElementById('hist-total-rounds').textContent = rows.length;
+            const totalCorrect = rows.reduce((sum, r) => sum + (r.score_correct || 0), 0);
+            const avgAcc = rows.length ? Math.round(rows.reduce((sum, r) => sum + (r.accuracy || 0), 0) / rows.length) : 0;
+            document.getElementById('hist-total-correct').textContent = totalCorrect;
+            document.getElementById('hist-avg-acc').textContent = avgAcc + "%";
+
+            if (rows.length === 0) {
+                listEl.innerHTML = `<p style="text-align:center; color:#777; padding:24px;">暂无练习记录，完成一组练习后会自动出现在这里！</p>`;
+                return;
+            }
+
+            listEl.innerHTML = rows.map(r => {
+                const dt = r.played_at ? new Date(r.played_at).toLocaleString('zh-MY', { hour12: false }) : '';
+                const mins = Math.floor((r.duration_seconds || 0) / 60);
+                const secs = (r.duration_seconds || 0) % 60;
+                const dur = mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
+                const wrongs = Array.isArray(r.wrong_words) ? r.wrong_words : [];
+                const wrongHtml = wrongs.length > 0
+                    ? `<div style="margin-top:4px;"><span style="font-size:0.82em; color:#666;">错题：</span>` +
+                      wrongs.map(w => `<span class="wrong-word-pill">${escapeHtml(w.bm || w.id)}</span>`).join('') + `</div>`
+                    : `<div style="font-size:0.82em; color:#2e7d32; font-weight:bold;">🌟 全对无错题！</div>`;
+                return `
+                    <div class="history-item">
+                        <div class="history-item-top">
+                            <span>📚 ${r.category === 'ALL' ? '全部题目' : escapeHtml(r.category)}</span>
+                            <span style="color:#1565c0;">✅ ${r.score_correct}/${r.total_questions} · 🎯 ${r.accuracy}% · ⏱️ ${dur}</span>
+                        </div>
+                        <div style="font-size:0.8em; color:#78909c;">🕒 ${dt}</div>
+                        ${wrongHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.onload = () => {
+            initGameData();
+        };
+    </script>
+</body>
+</html>
