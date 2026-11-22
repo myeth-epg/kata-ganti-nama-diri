@@ -1320,7 +1320,7 @@
         async function loadPendingAssignments(studentId) {
             try {
                 const rows = await sbFetch(`quiz_assignments_kgnd?student_id=eq.${studentId}&status=eq.pending&order=assigned_at.asc&select=*,quizzes_kgnd(*)`);
-                pendingAssignments = (rows || []).filter(r => r.quizzes_kgnd);
+                pendingAssignments = (rows || []).filter(r => r.quizzes_kgnd && r.quizzes_kgnd.is_archived !== true);
             } catch (err) {
                 pendingAssignments = [];
             }

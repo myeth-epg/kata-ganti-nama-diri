@@ -33,8 +33,10 @@ create table if not exists public.quizzes_kgnd (
   units jsonb default '[]'::jsonb,
   question_ids jsonb default '[]'::jsonb,
   question_count int default 20,
+  is_archived boolean not null default false,
   created_at timestamptz default now()
 );
+alter table public.quizzes_kgnd add column if not exists is_archived boolean not null default false;
 
 alter table public.quizzes_kgnd enable row level security;
 create policy "Allow public read quizzes_kgnd" on public.quizzes_kgnd for select using (true);

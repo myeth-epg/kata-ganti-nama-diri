@@ -324,6 +324,13 @@
                     <span id="create-quiz-msg" style="font-size:0.9em; font-weight:bold;"></span>
                 </div>
             </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                <span style="font-size:0.9em; color:#cbd5e1; font-weight:700;">📋 已创建的测验列表</span>
+                <label style="font-size:0.86em; color:#94a3b8; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox" id="show-archived-quizzes" onchange="renderQuizzesList()">
+                    <span id="archived-quizzes-label">📦 显示已归档测验 (0)</span>
+                </label>
+            </div>
             <div id="quizzes-list-wrap" style="display:flex; flex-direction:column; gap:14px;">
                 <div class="empty-msg">⏳ 加载测验列表中...</div>
             </div>
@@ -837,28 +844,42 @@
             await loadAllData();
         }
 
-        async function deleteQuiz(quizId, quizCode, assignCount) {
-            if (!confirm(`⚠️ 确定要删除测验「${quizCode}」吗？\n\n这将会同时删除该测验下的 ${assignCount} 条学生派发记录，且无法恢复！`)) return;
+        async function toggleArchiveQuiz(quizId, quizCode, archiveState) {
+            const actionLabel = archiveState ? '归档 (Archive)' : '取消归档 (Unarchive)';
+            const hint = archiveState
+                ? `\n\n归档后学生端将不再显示该测验，但所有历史记录都会保留，随时可取消归档。`
+                : `\n\n取消归档后，未完成该测验的学生将重新看到它。`;
+            if (!confirm(`确定要${actionLabel}测验「${quizCode}」吗？${hint}`)) return;
             try {
-                await sbFetch(`quizzes_kgnd?id=eq.${quizId}`, { method: "DELETE" });
+                await sbFetch(`quizzes_kgnd?id=eq.${quizId}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ is_archived: archiveState })
+                });
                 await loadAllData();
             } catch (err) {
-                alert("删除失败：" + err.message);
+                alert("操作失败：" + err.message + "\n\n（请确认已在 Supabase 运行: alter table public.quizzes_kgnd add column if not exists is_archived boolean not null default false;）");
             }
         }
 
         function renderQuizzesList() {
             const wrap = document.getElementById('quizzes-list-wrap');
             if (!wrap) return;
-            if (allQuizzes.length === 0) {
-                wrap.innerHTML = `<div class="table-wrap"><div class="empty-msg">暂无已创建的测验，请在上方创建 Quiz 001。</div></div>`;
+            const archivedCount = allQuizzes.filter(q => q.is_archived === true).length;
+            const archLbl = document.getElementById('archived-quizzes-label');
+            if (archLbl) archLbl.textContent = `📦 显示已归档测验 (${archivedCount})`;
+            const showArchived = document.getElementById('show-archived-quizzes')?.checked;
+            const visibleQuizzes = showArchived ? allQuizzes : allQuizzes.filter(q => q.is_archived !== true);
+
+            if (visibleQuizzes.length === 0) {
+                wrap.innerHTML = `<div class="table-wrap"><div class="empty-msg">${allQuizzes.length === 0 ? '暂无已创建的测验，请在上方创建 Quiz 001。' : '当前没有活跃的测验，可勾选上方「📦 显示已归档测验」查看或取消归档。'}</div></div>`;
                 return;
             }
             const stuMap = {};
             allStudents.forEach(s => { stuMap[s.id] = s; });
             const activeStudents = allStudents.filter(s => s.is_active !== false);
 
-            wrap.innerHTML = allQuizzes.map(q => {
+            wrap.innerHTML = visibleQuizzes.map(q => {
+                const isArch = q.is_archived === true;
                 const assigns = allAssignments.filter(a => a.quiz_id === q.id);
                 const doneCount = assigns.filter(a => a.status === 'completed').length;
                 const unitsArr = Array.isArray(q.units) ? q.units : [];
@@ -876,12 +897,16 @@
                         </tr>`;
                 }).join('');
                 const stuOptions = activeStudents.map(s => `<option value="${s.id}">${s.display_name} (${s.class_name || '-'})</option>`).join('');
+                const archBtn = isArch
+                    ? `<button class="btn btn-outline" style="padding:5px 10px; font-size:0.82em; color:#4ade80; border-color:#22c55e;" onclick="toggleArchiveQuiz('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}', false)">♻️ 取消归档</button>`
+                    : `<button class="btn btn-outline" style="padding:5px 10px; font-size:0.82em; color:#fb923c; border-color:#fb923c;" onclick="toggleArchiveQuiz('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}', true)">📦 归档</button>`;
                 return `
-                    <div class="table-wrap" style="padding:14px;">
+                    <div class="table-wrap" style="padding:14px; ${isArch ? 'opacity:0.7; border-color:#78350f;' : ''}">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
                             <div>
                                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                                     <span style="font-size:1.15em; font-weight:800; color:#60a5fa;">📝 ${q.quiz_code}</span>
+                                    ${isArch ? `<span class="pill-warn">📦 已归档</span>` : ''}
                                     ${q.title ? `<span style="color:#e2e8f0; font-weight:700;">${q.title}</span>` : ''}
                                     <span class="badge">${q.question_count} 题</span>
                                     <span class="pill-ok">完成 ${doneCount} / ${assigns.length} 人</span>
@@ -892,7 +917,7 @@
                                 <select class="filter-select" id="add-stu-${q.id}" style="padding:4px 8px; font-size:0.84em;">${stuOptions}</select>
                                 <button class="btn btn-primary" style="padding:5px 10px; font-size:0.82em;" onclick="assignQuizToExtraStudent('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}')">➕ 补派</button>
                                 <button class="btn btn-success" style="padding:5px 10px; font-size:0.82em;" onclick="assignQuizToAllMissing('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}')">➕ 一键补派新学生</button>
-                                <button class="btn btn-outline" style="padding:5px 10px; font-size:0.82em; color:#f87171; border-color:#ef4444;" onclick="deleteQuiz('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}', ${assigns.length})">🗑️ 删除测验</button>
+                                ${archBtn}
                             </div>
                         </div>
                         <table>
