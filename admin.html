@@ -800,6 +800,7 @@
             const sel = document.getElementById(`add-stu-${quizId}`);
             if (!sel || !sel.value) return;
             const stuId = sel.value;
+            const stu = allStudents.find(s => s.id === stuId) || {};
             const existing = allAssignments.find(a => a.quiz_id === quizId && a.student_id === stuId);
             if (existing) {
                 await sbFetch(`quiz_assignments_kgnd?id=eq.${existing.id}`, {
@@ -809,10 +810,41 @@
             } else {
                 await sbFetch("quiz_assignments_kgnd", {
                     method: "POST",
-                    body: JSON.stringify({ quiz_id: quizId, quiz_code: quizCode, student_id: stuId, status: "pending", attempt_no: 1 })
+                    body: JSON.stringify({ quiz_id: quizId, quiz_code: quizCode, student_id: stuId, username: stu.username || '', display_name: stu.display_name || '', status: "pending", attempt_no: 1 })
                 });
             }
             await loadAllData();
+        }
+
+        async function assignQuizToAllMissing(quizId, quizCode) {
+            const assignedIds = new Set(allAssignments.filter(a => a.quiz_id === quizId).map(a => a.student_id));
+            const missing = allStudents.filter(s => s.is_active !== false && !assignedIds.has(s.id));
+            if (missing.length === 0) {
+                alert("所有启用中的学生都已派发此测验！");
+                return;
+            }
+            if (!confirm(`确定将「${quizCode}」一键补派给尚未收到测验的 ${missing.length} 位学生吗？`)) return;
+            const rows = missing.map(s => ({
+                quiz_id: quizId,
+                quiz_code: quizCode,
+                student_id: s.id,
+                username: s.username || '',
+                display_name: s.display_name || '',
+                status: "pending",
+                attempt_no: 1
+            }));
+            await sbFetch("quiz_assignments_kgnd", { method: "POST", body: JSON.stringify(rows) });
+            await loadAllData();
+        }
+
+        async function deleteQuiz(quizId, quizCode, assignCount) {
+            if (!confirm(`⚠️ 确定要删除测验「${quizCode}」吗？\n\n这将会同时删除该测验下的 ${assignCount} 条学生派发记录，且无法恢复！`)) return;
+            try {
+                await sbFetch(`quizzes_kgnd?id=eq.${quizId}`, { method: "DELETE" });
+                await loadAllData();
+            } catch (err) {
+                alert("删除失败：" + err.message);
+            }
         }
 
         function renderQuizzesList() {
@@ -856,9 +888,11 @@
                                 </div>
                                 <div style="font-size:0.82em; color:#94a3b8; margin-top:4px;">单元：${unitsArr.join(' 、 ')} | 创建于 ${dt}</div>
                             </div>
-                            <div style="display:flex; gap:6px; align-items:center;">
+                            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                                 <select class="filter-select" id="add-stu-${q.id}" style="padding:4px 8px; font-size:0.84em;">${stuOptions}</select>
                                 <button class="btn btn-primary" style="padding:5px 10px; font-size:0.82em;" onclick="assignQuizToExtraStudent('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}')">➕ 补派</button>
+                                <button class="btn btn-success" style="padding:5px 10px; font-size:0.82em;" onclick="assignQuizToAllMissing('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}')">➕ 一键补派新学生</button>
+                                <button class="btn btn-outline" style="padding:5px 10px; font-size:0.82em; color:#f87171; border-color:#ef4444;" onclick="deleteQuiz('${q.id}', '${String(q.quiz_code).replace(/'/g, "\\'")}', ${assigns.length})">🗑️ 删除测验</button>
                             </div>
                         </div>
                         <table>
